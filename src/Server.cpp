@@ -32,17 +32,6 @@ int main(int argc, char *args[], char *arge[]) {
     RegisterSignalHandler();
     RemoveStdoutBuffering();
 
-
-    CgiBinRequest *cg = new CgiBinRequest("../cgi-bin/sum.py", nullptr);
-
-    cg->setEnvironmentVariables(arge);
-
-    cg->solve();
-
-    printf("-> %s", cg->getResponse()->c_str());
-
-    exit(0);
-
     auto *listener = new Listener();
 
     listener->Boot();
