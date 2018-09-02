@@ -28,6 +28,17 @@ int main(int argc, char *args[], char *arge[]) {
     // Move socket to server
     // Move binder to socket
     // Check Thread-Safety for multiple functions
+    // Remove buffers (use strings)
+    // Fix method naming
+    // Remove random todo lists
+    // Multi-threading tests
+    // Commenting
+    // Check 'const' keyword use
+    // Remove Environment pointer tracking
+    // Add comment why library is used
+    // Add missing env-vars on CGI-BIN
+    // Add timeout for empty-read to avoid locking
+    //
 
     RegisterSignalHandler();
     RemoveStdoutBuffering();
