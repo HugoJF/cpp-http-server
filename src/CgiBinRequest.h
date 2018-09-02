@@ -37,6 +37,10 @@ public:
     char *getFilePath();
 
     void addEnvironmentVariable(char string[13], char *string1);
+
+    int getBaseEnvironmentCount() const;
+
+    int getTotalEnvironmentCount() const;
 };
 
 

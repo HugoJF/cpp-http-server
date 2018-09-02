@@ -41,7 +41,6 @@ void CgiBinRequest::run() {
     close(link[0]); // read
     close(link[1]); // write
     if (execve(getFilePath(), argv, getEnvironment()) == -1) {
-        //if (execv(filePath, argv) == -1) {
         perror("execv() from run() in CgiBinRequest");
         exit(errno);
     }
@@ -54,7 +53,7 @@ char *CgiBinRequest::getFilePath() {
     int delta = (int) (end - originalPath);
     char *path = new char[strlen(CGI_BIN_FOLDER) + delta + 1];
     strcpy(path, CGI_BIN_FOLDER);
-    strncat(path, originalPath, delta);
+    strncat(path, originalPath, (size_t) delta);
     return path;
 }
 
@@ -62,7 +61,7 @@ void CgiBinRequest::listen() {
     close(link[1]); // write
     _ssize_t bytes = 1;
     _ssize_t total = 0;
-    wait(nullptr);
+    wait(nullptr); // should we wait first or consume/wait?
 
     while (bytes > 0) {
         memset(buffer, '\0', BUFFER_SIZE);
@@ -92,30 +91,23 @@ char *CgiBinRequest::getResponse() {
     return (char *) this->response->c_str();
 }
 
-// TODO: prettier way to get variables
-// set reference for cloning
-// set new variables
-// then combine (avoid re-allocating big array)
-// replace char*
-// use vectors
 void CgiBinRequest::setEnvironmentVariables(char **envp) {
     this->baseEnvironment = envp;
 }
 
 char **CgiBinRequest::getEnvironment() {
-    int vars = 0;
-    while (this->baseEnvironment[vars]) {
-        vars++;
-    }
-    vars += this->extendedEnvironment->size();
-    char **env = new char *[vars+1];
+    int vars = getTotalEnvironmentCount();
+    char **env = new char *[vars+1]; // nullptr terminator
+
     vars = 0;
-    while (this->baseEnvironment[vars]) {
+
+    while (this->baseEnvironment[vars] != nullptr) {
         env[vars] = this->baseEnvironment[vars];
         vars++;
     }
-    for (int i = 0; i < this->extendedEnvironment->size(); ++i, vars++) {
+    for (int i = 0; i < this->extendedEnvironment->size(); ++i) {
         env[vars] = (char *) this->extendedEnvironment->at(i).c_str();
+        vars++;
     }
 
     env[vars] = nullptr;
@@ -123,9 +115,24 @@ char **CgiBinRequest::getEnvironment() {
     return env;
 }
 
+int CgiBinRequest::getTotalEnvironmentCount() const {
+    int vars = getBaseEnvironmentCount();
+    vars += extendedEnvironment->size();
+    return vars;
+}
+
+int CgiBinRequest::getBaseEnvironmentCount() const {
+    int vars = 0;
+    while (baseEnvironment[vars] != nullptr) {
+        vars++;
+    }
+    return vars;
+}
+
 void CgiBinRequest::addEnvironmentVariable(char *key, char *value) {
     char *env = new char[strlen(key) + strlen(value) + 2];
 
+    // snprintf pls
     strcpy(env, key);
     strcat(env, "=");
     strcat(env, value);
