@@ -19,12 +19,14 @@ public:
 
     bool isDirectory();
     bool isFile();
+    bool isCgiBin();
 
     void process();
 
     int getSegmentCount();
 
     const char *getSegment(int i);
+
 };
 
 

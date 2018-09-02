@@ -14,6 +14,7 @@
 #include <src/HTTPRequest.h>
 
 #define BUFFER_SIZE 4096
+#define CGI_BIN_FOLDER ".."
 // TODO: Avoid using fixed buffer, if response is bigger than BUFFER_SIZE overflow will occur
 
 CgiBinRequest::CgiBinRequest(string filePath, HTTPRequest *httpRequest) {
@@ -28,6 +29,7 @@ CgiBinRequest::CgiBinRequest(string filePath, HTTPRequest *httpRequest) {
 //    envp[0] = "PATH=POTATO";
 //    envp[1] = nullptr;
 
+    printf("CGI-BIN Path: %s\n", this->getFilePath());
     if (pipe(link) < 0) {
         perror("pipe");
         exit(errno);
@@ -38,12 +40,22 @@ void CgiBinRequest::run() {
     dup2(link[1], STDOUT_FILENO);
     close(link[0]); // read
     close(link[1]); // write
-    if (execve(filePath.c_str(), argv, getEnvironment()) == -1) {
+    if (execve(getFilePath(), argv, getEnvironment()) == -1) {
         //if (execv(filePath, argv) == -1) {
         perror("execv() from run() in CgiBinRequest");
         exit(errno);
     }
     exit(0);
+}
+
+char *CgiBinRequest::getFilePath() {
+    char *originalPath = (char*)filePath.c_str();
+    char *end = index(originalPath, '?');
+    int delta = (int) (end - originalPath);
+    char *path = new char[strlen(CGI_BIN_FOLDER) + delta + 1];
+    strcpy(path, CGI_BIN_FOLDER);
+    strncat(path, originalPath, delta);
+    return path;
 }
 
 void CgiBinRequest::listen() {
@@ -76,8 +88,8 @@ void CgiBinRequest::solve() {
     }
 }
 
-string *CgiBinRequest::getResponse() {
-    return this->response;
+char *CgiBinRequest::getResponse() {
+    return (char *) this->response->c_str();
 }
 
 // TODO: prettier way to get variables
@@ -96,7 +108,7 @@ char **CgiBinRequest::getEnvironment() {
         vars++;
     }
     vars += this->extendedEnvironment->size();
-    char **env = new char *[vars];
+    char **env = new char *[vars+1];
     vars = 0;
     while (this->baseEnvironment[vars]) {
         env[vars] = this->baseEnvironment[vars];
@@ -106,5 +118,17 @@ char **CgiBinRequest::getEnvironment() {
         env[vars] = (char *) this->extendedEnvironment->at(i).c_str();
     }
 
+    env[vars] = nullptr;
+
     return env;
+}
+
+void CgiBinRequest::addEnvironmentVariable(char *key, char *value) {
+    char *env = new char[strlen(key) + strlen(value) + 2];
+
+    strcpy(env, key);
+    strcat(env, "=");
+    strcat(env, value);
+
+    this->extendedEnvironment->push_back(env);
 }

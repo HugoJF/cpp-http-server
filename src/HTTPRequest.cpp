@@ -9,9 +9,7 @@
 HTTPRequest::HTTPRequest(char *rawRequest) {
     this->rawRequest = CopyString(rawRequest);
 
-    PrintRawRequest();
     Parse();
-    PrintRawRequest();
 }
 
 char *HTTPRequest::CopyString(const char *rawRequest) {
@@ -28,7 +26,6 @@ char *HTTPRequest::CopyRawRequest() {
 
 void HTTPRequest::Parse() {
     int count = CountRequestLines();
-    PrintRawRequest();
 
     SplitRequest();
     ParseRequestLine();
@@ -39,17 +36,20 @@ int HTTPRequest::CountRequestLines() {
     // HTTP Request end with 2 \r\n,
     int count = -1;
     char *movingPtr = CopyRawRequest();
-    printf("Couting Request Lines from: %s\n", rawRequest);
     while ((movingPtr = strstr(movingPtr, "\r\n"))) {
         count++;
         movingPtr++;
     }
-    printf("Request line count: %d\n", count);
-    requestLineCount = count;
-    headerCount = count - 1;
-    requestParts = new char *[count];
-    // clonar strings
-    return count;
+    if (count > 0) {
+        printf("Request line count: %d\n", count);
+        requestLineCount = count;
+        headerCount = count - 1;
+        requestParts = new char *[count];
+        // clonar strings
+        return count;
+    } else {
+        return 0;
+    }
 }
 
 void HTTPRequest::SplitRequest() {
@@ -58,7 +58,6 @@ void HTTPRequest::SplitRequest() {
     int line = 0;
     piece = strtok(rawRequest, "\r\n");
     while (piece != nullptr) {
-        printf("Processing line %d: %s\n", line, piece);
         requestParts[line++] = piece;
         piece = strtok(nullptr, "\r\n");
     }
@@ -72,9 +71,6 @@ char *HTTPRequest::GetLine(int line) {
     return requestParts[line];
 }
 
-void HTTPRequest::PrintRawRequest() {
-    printf("Raw Request: ##########\n%s\n#########\nLength: %d\n", rawRequest, strlen(rawRequest));
-}
 
 void HTTPRequest::ParseRequestLine() {
     requestLine = new char *[3];
@@ -82,7 +78,6 @@ void HTTPRequest::ParseRequestLine() {
     int part = 0;
     piece = strtok(GetRequestLine(), " ");
     while (piece != nullptr) {
-        printf("Parsing %d part: %s\n", part, piece);
         requestLine[part++] = piece;
         piece = strtok(nullptr, " ");
     }

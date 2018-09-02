@@ -43,6 +43,7 @@ void Listener::Listen() {
 }
 
 int Listener::Accept() {
+    printf("##### Accepting connection #####\n");
     connectionFd = accept(listenFd, (struct sockaddr *) NULL, NULL);
     if (connectionFd == -1) {
         perror("Accept()");
@@ -67,7 +68,7 @@ HTTPRequest *Listener::ReadRequest() {
             printf("Error reading message: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         } else {
-            printf("Read %d bytes: %s\n", (int) requestBytes, buffer);
+            printf("Read %d bytes\n", (int) requestBytes);
             requestBytesTotal += requestBytes;
         }
     }

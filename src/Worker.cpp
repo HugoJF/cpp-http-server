@@ -10,6 +10,7 @@
 #include <src/Worker.h>
 #include <src/FileRequest.h>
 #include <src/RequestSolver.h>
+#include <src/CgiBinRequest.h>
 
 #define BUFFER_SIZE 5000
 
@@ -32,11 +33,26 @@ void Worker::Work() {
         fixedUri = uri;
     }
 
-    auto *fr = new FileRequest(fixedUri);
+    char *response;
 
-    fr->Solve();
+    if(rs->isCgiBin()) {
+        printf("Request is inside CGI-BIN directory...\n");
+        auto *cgi = new CgiBinRequest(fixedUri, httpRequest);
+        cgi->setEnvironmentVariables(environ);
+        cgi->addEnvironmentVariable("QUERY_STRING", httpRequest->getQueryString());
+        cgi->solve();
+        response = cgi->getResponse();
+    } else {
+        printf("Request is for static file\n");
+        auto *fr = new FileRequest(fixedUri);
+        fr->Solve();
+        response = fr->GetResponse();
+    }
 
-    SendResponseToClient(fr->GetResponse(), listener->getConnectionFd());
+    printf("Returning response: (%s)\n", response);
+
+
+    SendResponseToClient(response, listener->getConnectionFd());
 }
 
 

@@ -19,6 +19,11 @@ bool RequestSolver::isFile() {
     return index(getSegment(getSegmentCount() - 1), '.') != nullptr;
 }
 
+bool RequestSolver::isCgiBin() {
+    return strstr(uri, "cgi-bin");
+}
+
+
 
 void RequestSolver::process() {
     char *copy = new char[strlen(uri) + 1];

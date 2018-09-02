@@ -28,11 +28,15 @@ private:
 public:
     CgiBinRequest(string filePath, HTTPRequest *httpRequest);
     void solve();
-    string *getResponse();
+    char *getResponse();
 
     void setEnvironmentVariables(char **envp);
 
     char **getEnvironment();
+
+    char *getFilePath();
+
+    void addEnvironmentVariable(char string[13], char *string1);
 };
 
 
