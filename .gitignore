@@ -1,0 +1,4 @@
+.idea/
+cgi-bin/*
+cmake-build-debug/
+htdocs/*
