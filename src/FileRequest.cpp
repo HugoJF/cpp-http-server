@@ -21,15 +21,9 @@ char *FileRequest::ResolveFilePath(char *filePath) {
 
     printf("Full path for file: %s\n", fullPath);
 
-    if (stat(fullPath, sb) == -1) {
+    if (stat(this->BuildPath(filePath), sb) == -1) {
         perror("ResolveFilePath()");
-        if (errno == 2) { // TODO: better error handling
-            fullPath = ResolveFilePath("/404.html");
-            printf("File could not be found, replacing with 404 error: %s\n", fullPath);
-        } else {
-            perror("stat() on response file!");
-            exit(errno);
-        }
+        return nullptr;
     }
     if (sb != nullptr) {
         printf("L Stated File\n");
@@ -47,13 +41,17 @@ char *FileRequest::BuildPath(const char *string) {
     return fullPath;
 }
 
-void FileRequest::Solve() {
+int FileRequest::Solve() {
+
+    if(this->filePath == nullptr) {
+        return 1; // file not found
+    }
 
     int filefd = open(this->filePath, O_RDONLY);
 
     if (filefd < 0) {
         perror("open");
-        exit(EXIT_FAILURE);
+        return errno;
     }
 
     int bufferSize = sizeof(char) * (sb->st_size + 1); // +1 for \0
@@ -63,14 +61,13 @@ void FileRequest::Solve() {
     auto readBytesTotal = (_ssize_t) 0;
     auto readBytes = (_ssize_t) bufferSize;
 
-    // TODO improve loop
     while (readBytes >= bufferSize) {
         printf("#### Reading data file...\n");
         readBytes = read(filefd, buffer + readBytesTotal, (size_t) bufferSize);
 
         if (readBytes < 0) {
             printf("Error reading file: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            return errno;
         } else {
             printf("Read %d bytes\n", (int) readBytes);
             readBytesTotal += readBytes;
@@ -80,6 +77,8 @@ void FileRequest::Solve() {
     close(filefd);
 
     this->fileContent = buffer;
+
+    return 0;
 }
 
 char *FileRequest::GetResponse() {

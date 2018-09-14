@@ -15,7 +15,7 @@ class FileRequest {
     char *ResolveFilePath(char* filePath);
 public:
     FileRequest(char* filePath);
-    void Solve();
+    int Solve();
     char *GetResponse();
 
 };
