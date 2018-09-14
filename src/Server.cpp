@@ -39,8 +39,6 @@ void *dispatchThread(void *args);
 
 int main(int argc, char *args[], char *arge[]) {
 
-    // Move socket to server
-    // Move binder to socket
     // Check Thread-Safety for multiple functions
     // Remove buffers (use strings)
     // Fix method naming
@@ -52,7 +50,7 @@ int main(int argc, char *args[], char *arge[]) {
     // Add comment why library is used
     // Add missing env-vars on CGI-BIN
     // Add timeout for empty-read to avoid locking
-    //
+    // BUG: Acessing index.html then trying to access CGI-BIN glitches CGI-BIN Environment Variables, possible fix: environ pointer
 
     RegisterSignalHandler();
     RemoveStdoutBuffering();
@@ -73,10 +71,11 @@ int main(int argc, char *args[], char *arge[]) {
         auto *attributes = new pthread_attr_t();
 
         printf("Dispatching new listener and worker thread....\n");
-        if(pthread_create(thread_id, nullptr, dispatchThread, (void*)&newConnFd)) {
-            perror("pthreads()");
-            exit(errno);
-        }
+//        if(pthread_create(thread_id, nullptr, dispatchThread, (void*)&newConnFd)) {
+//            perror("pthreads()");
+//            exit(errno);
+//        }
+        dispatchThread((void*) &newConnFd);
     }
 }
 
@@ -89,9 +88,15 @@ void *dispatchThread(void *args) {
 
     auto *request = listener->ReadRequest();
 
-    auto *worker = new Worker(listener, request);
+    if(request == nullptr) {
+        printf("Received empty request, skipping worker...\n");
+    } else {
+        auto *worker = new Worker(listener, request);
 
-    worker->Work();
+        worker->Work();
+
+        delete worker;
+    }
 
     listener->Close();
 }
