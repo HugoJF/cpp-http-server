@@ -18,7 +18,9 @@ public:
     RequestSolver(char *uri);
 
     bool isDirectory();
+
     bool isFile();
+
     bool isCgiBin();
 
     void process();

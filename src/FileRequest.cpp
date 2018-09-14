@@ -13,16 +13,16 @@
 
 FileRequest::FileRequest(char *filePath) {
     sb = new struct stat;
-    this->filePath = this->ResolveFilePath(filePath);
+    this->filePath = this->resolveFilePath(filePath);
 }
 
-char *FileRequest::ResolveFilePath(char *filePath) {
-    char *fullPath = BuildPath(filePath);
+char *FileRequest::resolveFilePath(char *filePath) {
+    char *fullPath = buildPath(filePath);
 
     printf("Full path for file: %s\n", fullPath);
 
-    if (stat(this->BuildPath(filePath), sb) == -1) {
-        perror("ResolveFilePath()");
+    if (stat(this->buildPath(filePath), sb) == -1) {
+        perror("resolveFilePath()");
         return nullptr;
     }
     if (sb != nullptr) {
@@ -33,7 +33,7 @@ char *FileRequest::ResolveFilePath(char *filePath) {
     return fullPath;
 }
 
-char *FileRequest::BuildPath(const char *string) {
+char *FileRequest::buildPath(const char *string) {
     auto *fullPath = new char[strlen(HTDOCS_PATH) + strlen(string) + 1];
 
     sprintf(fullPath, "%s%s", HTDOCS_PATH, string);
@@ -41,9 +41,9 @@ char *FileRequest::BuildPath(const char *string) {
     return fullPath;
 }
 
-int FileRequest::Solve() {
+int FileRequest::solve() {
 
-    if(this->filePath == nullptr) {
+    if (this->filePath == nullptr) {
         return 1; // file not found
     }
 
@@ -81,6 +81,6 @@ int FileRequest::Solve() {
     return 0;
 }
 
-char *FileRequest::GetResponse() {
+char *FileRequest::getResponse() {
     return this->fileContent;
 }

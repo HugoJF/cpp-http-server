@@ -75,7 +75,7 @@ int main(int argc, char *args[], char *arge[]) {
 //            perror("pthreads()");
 //            exit(errno);
 //        }
-        dispatchThread((void*) &newConnFd);
+        dispatchThread((void *) &newConnFd);
     }
 }
 
@@ -86,19 +86,19 @@ void *dispatchThread(void *args) {
 
     auto *listener = new Listener(*newConnFd);
 
-    auto *request = listener->ReadRequest();
+    auto *request = listener->readRequest();
 
-    if(request == nullptr) {
+    if (request == nullptr) {
         printf("Received empty request, skipping worker...\n");
     } else {
         auto *worker = new Worker(listener, request);
 
-        worker->Work();
+        worker->work();
 
         delete worker;
     }
 
-    listener->Close();
+    listener->close();
 }
 
 struct sockaddr_in *serverAddress;

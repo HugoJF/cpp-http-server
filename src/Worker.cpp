@@ -19,8 +19,8 @@ Worker::Worker(Listener *listener, HTTPRequest *httpRequest) {
     this->listener = listener;
 }
 
-void Worker::Work() {
-    char *uri = httpRequest->GetRequestLine(REQUEST_URI);
+void Worker::work() {
+    char *uri = httpRequest->getRequestLine(REQUEST_URI);
     auto *rs = new RequestSolver(uri);
     char *response;
     rs->process();
@@ -37,7 +37,7 @@ void Worker::Work() {
 
         // check for index.html
         auto *indexRequest = new FileRequest(fixedUri);
-        int result = indexRequest->Solve();
+        int result = indexRequest->solve();
 
         if (result != 0) {
             delete fixedUri;
@@ -57,15 +57,15 @@ void Worker::Work() {
             printf("Request is inside CGI-BIN directory...\n");
             auto *cgi = new CgiBinRequest(fixedUri, httpRequest);
             cgi->setEnvironmentVariables(environ);
-            cgi->addEnvironmentVariable("PATH_INFO", httpRequest->GetRequestLine(REQUEST_URI));
+            cgi->addEnvironmentVariable("PATH_INFO", httpRequest->getRequestLine(REQUEST_URI));
             cgi->addEnvironmentVariable("QUERY_STRING", httpRequest->getQueryString());
             cgi->solve();
             response = cgi->getResponse();
         } else {
             printf("Request is for static file\n");
             auto *fr = new FileRequest(fixedUri);
-            fr->Solve();
-            response = fr->GetResponse();
+            fr->solve();
+            response = fr->getResponse();
         }
 
     printf("Returning response: (%s)\n", response);
@@ -73,12 +73,12 @@ void Worker::Work() {
     if(response == nullptr) {
         printf("Could not send response to client: NULL response\n");
     } else {
-        SendResponseToClient(response, listener->getConnectionFd());
+        sendResponseToClient(response, listener->getConnectionFd());
     }
 }
 
 
-void Worker::SendResponseToClient(char *response, int fd) {
+void Worker::sendResponseToClient(char *response, int fd) {
 
     int bytesToSend = sizeof(char) * strlen(response);
     ssize_t bytesSent = 0;

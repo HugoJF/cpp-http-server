@@ -25,16 +25,19 @@ private:
     void listen();
 
     void run();
+
 public:
-    CgiBinRequest(char* filePath, HTTPRequest *httpRequest);
+    CgiBinRequest(char *filePath, HTTPRequest *httpRequest);
+
     void solve();
-    char *getResponse();
 
     void setEnvironmentVariables(char **envp);
 
-    char **getEnvironment();
+    char *getResponse();
 
     char *getFilePath();
+
+    char **getEnvironment();
 
     void addEnvironmentVariable(char string[13], char *string1);
 

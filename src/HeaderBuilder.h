@@ -16,17 +16,20 @@ private:
     int allocatedHeaders = 0;
     int headerCount = 0;
 
-    void ResizeArray();
-    int ComputeHeaderSize();
+    void resizeArray();
+
+    int computeHeaderSize();
 
 public:
     HeaderBuilder();
 
-    void AddHeader(char *key, char *value);
-    Header* GetHeader(char *key);
-    Header* GetHeader(int index);
+    void addHeader(char *key, char *value);
 
-    char *Render();
+    Header *getHeader(char *key);
+
+    Header *getHeader(int index);
+
+    char *render();
 };
 
 

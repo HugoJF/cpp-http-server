@@ -11,10 +11,10 @@
 #define REALLOC_MULTIPLIER 2
 
 HeaderBuilder::HeaderBuilder() {
-    ResizeArray();
+    resizeArray();
 }
 
-void HeaderBuilder::ResizeArray() {
+void HeaderBuilder::resizeArray() {
     if (allocatedHeaders == 0) {
         allocatedHeaders = INITIAL_COUNT;
         headers = (Header **) malloc(sizeof(Header *) * allocatedHeaders);
@@ -25,37 +25,37 @@ void HeaderBuilder::ResizeArray() {
         allocatedHeaders *= REALLOC_MULTIPLIER;
         headers = (Header **) realloc(headers, sizeof(Header *) * allocatedHeaders);
         for (int i = allocatedHeaders / REALLOC_MULTIPLIER; i < allocatedHeaders; ++i) {
-             headers[i] = (Header *) malloc(sizeof(Header));
+            headers[i] = (Header *) malloc(sizeof(Header));
         }
     }
 }
 
-void HeaderBuilder::AddHeader(char *key, char *value) {
-    ResizeArray();
+void HeaderBuilder::addHeader(char *key, char *value) {
+    resizeArray();
     headers[headerCount]->key = key;
     headers[headerCount++]->value = value;
 }
 
-Header *HeaderBuilder::GetHeader(char *key) {
+Header *HeaderBuilder::getHeader(char *key) {
     for (int i = 0; i < headerCount; ++i) {
-        if(strcmp(key, GetHeader(i)->key) == 0) {
-            return GetHeader(i);
+        if (strcmp(key, getHeader(i)->key) == 0) {
+            return getHeader(i);
         }
     }
 
     return nullptr;
 }
 
-Header *HeaderBuilder::GetHeader(int index) {
+Header *HeaderBuilder::getHeader(int index) {
     return headers[index];
 }
 
-int HeaderBuilder::ComputeHeaderSize() {
+int HeaderBuilder::computeHeaderSize() {
     int size = 0;
 
     for (int i = 0; i < headerCount; ++i) {
-        size += strlen(GetHeader(i)->key);
-        size += strlen(GetHeader(i)->value);
+        size += strlen(getHeader(i)->key);
+        size += strlen(getHeader(i)->value);
         size += 4; // CRLF and ": "
     }
 
@@ -64,8 +64,8 @@ int HeaderBuilder::ComputeHeaderSize() {
     return size;
 }
 
-char *HeaderBuilder::Render() {
-    int computedSize = ComputeHeaderSize();
+char *HeaderBuilder::render() {
+    int computedSize = computeHeaderSize();
     char *render = (char *) malloc(sizeof(char) * (computedSize + 1));
     memset(render, 'a', computedSize + 1);
     char *current = render;
@@ -74,13 +74,13 @@ char *HeaderBuilder::Render() {
     printf("Rendering %d headers\n", headerCount);
 
     for (int i = 0; i < headerCount; ++i) {
-        Header *h = GetHeader(i);
+        Header *h = getHeader(i);
         printf("Rendering %s: %s\n", h->key, h->value);
 
         sprintf(current, "%s: %s\r\n", h->key, h->value);
-        
+
         current += strlen(h->key) + strlen(h->value) + 4;
     }
-    
+
     return render;
 }

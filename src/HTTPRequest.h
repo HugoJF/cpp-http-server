@@ -18,45 +18,45 @@ private:
     int requestLineCount;
     int headerCount;
 
-    void Parse();
+    void parse();
 
 public:
     HTTPRequest(char *rawRequest);
 
-    void PrintRawRequest();
+    int countRequestLines();
 
-    char *GetRequest();
+    void printRawRequest();
 
-    char *GetLine(int line);
+    void splitRequest();
 
-    int CountRequestLines();
+    void parseRequestLine();
 
-    void SplitRequest();
+    void parseRequestHeader();
 
-    void ParseRequestLine();
+    void parserHeader(int i);
 
-    void ParseRequestHeader();
+    char *getRequestLine();
 
-    char *GetRequestLine();
+    char *getRequestLine(int i);
 
-    char *GetRequestLine(int i);
+    char *getRawHeader(int i);
 
-    void ParserHeader(int i);
+    char *getHeaderValue(int i);
 
-    char *GetRawHeader(int i);
+    char *copyString(const char *rawRequest);
 
-    char **GetHeader(int i);
-
-    char *GetHeaderValue(int i);
-
-    char **GetHeaderValue(const char string[7]);
-
-
-    char* CopyString(const char *rawRequest);
-
-    char *CopyRawRequest();
+    char *copyRawRequest();
 
     char *getQueryString();
+
+    char *getRequest();
+
+    char *getLine(int line);
+
+
+    char **getHeader(int i);
+
+    char **getHeaderValue(const char *string);
 };
 
 

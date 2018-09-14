@@ -40,9 +40,9 @@ void CgiBinRequest::run() {
 }
 
 char *CgiBinRequest::getFilePath() {
-    char *originalPath = (char*)filePath->c_str();
+    char *originalPath = (char *) filePath->c_str();
     char *end = index(originalPath, '?');
-    if(end == nullptr) {
+    if (end == nullptr) {
         end = originalPath + strlen(originalPath);
     }
     int delta = (int) (end - originalPath);
@@ -97,7 +97,7 @@ void CgiBinRequest::setEnvironmentVariables(char **envp) {
 
 char **CgiBinRequest::getEnvironment() {
     int vars = getTotalEnvironmentCount();
-    char **env = new char *[vars+1]; // nullptr terminator
+    char **env = new char *[vars + 1]; // nullptr terminator
 
     vars = 0;
 

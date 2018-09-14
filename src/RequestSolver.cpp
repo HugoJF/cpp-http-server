@@ -24,7 +24,6 @@ bool RequestSolver::isCgiBin() {
 }
 
 
-
 void RequestSolver::process() {
     char *copy = new char[strlen(uri) + 1];
     this->segmentCount = countSegments();

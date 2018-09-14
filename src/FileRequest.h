@@ -11,12 +11,16 @@ class FileRequest {
     char *fileContent;
     struct stat *sb;
 
-    char *BuildPath(const char*);
-    char *ResolveFilePath(char* filePath);
+    char *buildPath(const char *);
+
+    char *resolveFilePath(char *filePath);
+
 public:
-    FileRequest(char* filePath);
-    int Solve();
-    char *GetResponse();
+    FileRequest(char *filePath);
+
+    int solve();
+
+    char *getResponse();
 
 };
 

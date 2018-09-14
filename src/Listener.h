@@ -23,9 +23,9 @@ public:
 
     const sockaddr_in &getServerAddress() const;
 
-    HTTPRequest *ReadRequest();
+    HTTPRequest *readRequest();
 
-    void Close();
+    void close();
 };
 
 

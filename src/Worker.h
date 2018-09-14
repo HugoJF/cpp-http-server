@@ -15,10 +15,10 @@ public:
 
     Worker(Listener *listener, HTTPRequest *httpRequest);
 
-    void Work();
+    void work();
 
 private:
-    void SendResponseToClient(char *path, int fd);
+    void sendResponseToClient(char *path, int fd);
 };
 
 

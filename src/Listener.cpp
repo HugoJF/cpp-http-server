@@ -16,7 +16,7 @@ Listener::Listener(int connectionFd) {
 }
 
 
-HTTPRequest *Listener::ReadRequest() {
+HTTPRequest *Listener::readRequest() {
 
     auto bufferSize = (_ssize_t) 1024;
     char buffer[bufferSize + 1];
@@ -42,13 +42,13 @@ HTTPRequest *Listener::ReadRequest() {
 
     auto *hp = new HTTPRequest(buffer);
 
-    if(hp->CountRequestLines() == 0) {
+    if (hp->countRequestLines() == 0) {
         return nullptr;
     }
 
-    printf("Request method: %s\n", hp->GetRequestLine(REQUEST_METHOD));
-    printf("Request URI: %s\n", hp->GetRequestLine(REQUEST_URI));
-    printf("Request protocol: %s\n", hp->GetRequestLine(REQUEST_PROTOCOL));
+    printf("Request method: %s\n", hp->getRequestLine(REQUEST_METHOD));
+    printf("Request URI: %s\n", hp->getRequestLine(REQUEST_URI));
+    printf("Request protocol: %s\n", hp->getRequestLine(REQUEST_PROTOCOL));
 
     return hp;
 
@@ -58,7 +58,7 @@ int Listener::getConnectionFd() const {
     return connectionFd;
 }
 
-void Listener::Close() {
+void Listener::close() {
     // Avoids ERR_CONNECTION_RESET on Chrome
     printf("Closing connection\n");
     close(connectionFd);
