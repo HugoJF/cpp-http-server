@@ -42,6 +42,10 @@ HTTPRequest *Listener::ReadRequest() {
 
     auto *hp = new HTTPRequest(buffer);
 
+    if(hp->CountRequestLines() == 0) {
+        return nullptr;
+    }
+
     printf("Request method: %s\n", hp->GetRequestLine(REQUEST_METHOD));
     printf("Request URI: %s\n", hp->GetRequestLine(REQUEST_URI));
     printf("Request protocol: %s\n", hp->GetRequestLine(REQUEST_PROTOCOL));
