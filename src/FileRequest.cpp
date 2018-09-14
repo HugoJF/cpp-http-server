@@ -27,6 +27,7 @@ char *FileRequest::ResolveFilePath(char *filePath) {
             fullPath = ResolveFilePath("/404.html");
             printf("File could not be found, replacing with 404 error: %s\n", fullPath);
         } else {
+            perror("stat() on response file!");
             exit(errno);
         }
     }
@@ -75,6 +76,8 @@ void FileRequest::Solve() {
             readBytesTotal += readBytes;
         }
     }
+
+    close(filefd);
 
     this->fileContent = buffer;
 }
