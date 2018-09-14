@@ -2,6 +2,7 @@
 #include <string.h> // memset
 #include <fcntl.h> // open
 #include <unistd.h>
+#include <pthread.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,6 +24,19 @@ void RegisterSignalHandler();
 
 using namespace std;
 
+void Boot();
+
+void BuildSocket();
+
+void Bind();
+
+void Listen();
+
+int Accept();
+
+void *dispatchThread(void *args);
+
+
 int main(int argc, char *args[], char *arge[]) {
 
     // Move socket to server
@@ -43,29 +57,87 @@ int main(int argc, char *args[], char *arge[]) {
     RegisterSignalHandler();
     RemoveStdoutBuffering();
 
-    auto *listener = new Listener();
+    Boot();
 
-    listener->Boot();
+    BuildSocket();
 
-    listener->BuildSocket();
+    Bind();
 
-    listener->Bind();
-
-    listener->Listen();
+    Listen();
 
     int connections = 0;
 
-    while (connections++ < 50) {
-        listener->Accept();
+    while (connections++ < 5000) {
+        int newConnFd = Accept();
+        auto *thread_id = new pthread_t();
+        auto *attributes = new pthread_attr_t();
 
-        auto *request = listener->ReadRequest();
-
-        auto *worker = new Worker(listener, request);
-
-        worker->Work();
-
-        listener->Close();
+        printf("Dispatching new listener and worker thread....\n");
+        if(pthread_create(thread_id, nullptr, dispatchThread, (void*)&newConnFd)) {
+            perror("pthreads()");
+            exit(errno);
+        }
     }
+}
+
+void *dispatchThread(void *args) {
+    int *newConnFd = (int *) (args);
+
+    printf("Received connection %d\n", newConnFd);
+
+    auto *listener = new Listener(*newConnFd);
+
+    auto *request = listener->ReadRequest();
+
+    auto *worker = new Worker(listener, request);
+
+    worker->Work();
+
+    listener->Close();
+}
+
+struct sockaddr_in *serverAddress;
+uint16_t port = 8080;
+int listenFd = 0;
+
+void Boot() {
+    serverAddress = new sockaddr_in();
+    memset(serverAddress, '\0', sizeof(sockaddr_in));
+
+    serverAddress->sin_family = AF_INET;
+    serverAddress->sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddress->sin_port = htons(port);
+}
+
+void BuildSocket() {
+    listenFd = socket(AF_INET, SOCK_STREAM, 0);
+}
+
+void Bind() {
+    if (bind(listenFd, (struct sockaddr *) serverAddress, sizeof(sockaddr_in)) == -1) {
+        perror("Bind()");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void Listen() {
+    if (listen(listenFd, 3)) {
+        perror("Listen()");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Listening on port %d\n", port);
+}
+
+int Accept() {
+    printf("##### Waiting for new connection #####\n");
+    int connectionFd = accept(listenFd, nullptr, nullptr);
+    printf("Accepted new connection..\n");
+    if (connectionFd == -1) {
+        perror("Accept()");
+        exit(EXIT_FAILURE);
+    }
+    return connectionFd;
 }
 
 void HandleSignal(int signum) {
@@ -77,4 +149,4 @@ void RegisterSignalHandler() {
 }
 
 
-void RemoveStdoutBuffering() { setbuf(stdout, 0); }
+void RemoveStdoutBuffering() { setbuf(stdout, nullptr); }

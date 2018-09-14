@@ -11,45 +11,10 @@
 #include <src/HTTPRequest.h>
 #include <src/Listener.h>
 
-Listener::Listener() {
+Listener::Listener(int connectionFd) {
+    this->connectionFd = connectionFd;
 }
 
-void Listener::Boot() {
-    memset(&this->serverAddress, '0', sizeof(serverAddress));
-
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddress.sin_port = htons(port);
-}
-
-void Listener::BuildSocket() {
-    listenFd = socket(AF_INET, SOCK_STREAM, 0);
-}
-
-void Listener::Bind() {
-    if (bind(listenFd, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) == -1) {
-        perror("Bind()");
-        exit(EXIT_FAILURE);
-    }
-}
-
-void Listener::Listen() {
-    if (listen(listenFd, 3)) {
-        perror("Listen()");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Listening on port %d\n", port);
-}
-
-int Listener::Accept() {
-    printf("##### Accepting connection #####\n");
-    connectionFd = accept(listenFd, (struct sockaddr *) NULL, NULL);
-    if (connectionFd == -1) {
-        perror("Accept()");
-        exit(EXIT_FAILURE);
-    }
-}
 
 HTTPRequest *Listener::ReadRequest() {
 
@@ -73,6 +38,8 @@ HTTPRequest *Listener::ReadRequest() {
         }
     }
 
+    printf("Entire request was %d bytes.\n", (int) requestBytesTotal);
+
     auto *hp = new HTTPRequest(buffer);
 
     printf("Request method: %s\n", hp->GetRequestLine(REQUEST_METHOD));
@@ -83,20 +50,8 @@ HTTPRequest *Listener::ReadRequest() {
 
 }
 
-uint16_t Listener::getPort() const {
-    return port;
-}
-
-int Listener::getListenFd() const {
-    return listenFd;
-}
-
 int Listener::getConnectionFd() const {
     return connectionFd;
-}
-
-const sockaddr_in &Listener::getServerAddress() const {
-    return serverAddress;
 }
 
 void Listener::Close() {
