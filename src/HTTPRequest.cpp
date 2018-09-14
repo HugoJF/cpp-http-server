@@ -27,9 +27,11 @@ char *HTTPRequest::CopyRawRequest() {
 void HTTPRequest::Parse() {
     int count = CountRequestLines();
 
-    SplitRequest();
-    ParseRequestLine();
-    ParseRequestHeader();
+    if (count > 0) {
+        SplitRequest();
+        ParseRequestLine();
+        ParseRequestHeader();
+    }
 }
 
 int HTTPRequest::CountRequestLines() {
@@ -132,7 +134,14 @@ char *HTTPRequest::getQueryString() {
     char *uri = this->GetRequestLine(REQUEST_URI);
 
     // Get pointer to characters following '?'
-    char *start = index(uri, '?') + 1;
+    char *start = index(uri, '?');
+
+    // If there are no parameters
+    if (start == nullptr) {
+        start = uri + strlen(uri);
+    } else {
+        start += 1;
+    }
     // Get pointer to end of string
     char *end = (uri + strlen(uri));
     // Calculate how many chars to the end of string + null terminator
