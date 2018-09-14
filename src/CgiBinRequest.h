@@ -16,7 +16,7 @@ private:
     HTTPRequest *httpRequest;
     int link[2];
     char *buffer;
-    string filePath;
+    string *filePath;
     string *response;
     char **argv;
     char **baseEnvironment;
@@ -26,7 +26,7 @@ private:
 
     void run();
 public:
-    CgiBinRequest(string filePath, HTTPRequest *httpRequest);
+    CgiBinRequest(char* filePath, HTTPRequest *httpRequest);
     void solve();
     char *getResponse();
 

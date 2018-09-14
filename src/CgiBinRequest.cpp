@@ -17,23 +17,15 @@
 #define CGI_BIN_FOLDER ".."
 // TODO: Avoid using fixed buffer, if response is bigger than BUFFER_SIZE overflow will occur
 
-CgiBinRequest::CgiBinRequest(string filePath, HTTPRequest *httpRequest) {
-    this->filePath = std::move(filePath);
+CgiBinRequest::CgiBinRequest(char *filePath, HTTPRequest *httpRequest) {
     this->httpRequest = httpRequest;
     this->buffer = new char[BUFFER_SIZE];
     this->extendedEnvironment = new vector<string>();
     this->argv = new char *[1];
-    response = new string();
+    this->filePath = new string(filePath);
+    this->response = new string;
     argv[0] = nullptr;
-//    this->envp = new char*[2];
-//    envp[0] = "PATH=POTATO";
-//    envp[1] = nullptr;
-
     printf("CGI-BIN Path: %s\n", this->getFilePath());
-    if (pipe(link) < 0) {
-        perror("pipe");
-        exit(errno);
-    }
 }
 
 void CgiBinRequest::run() {
@@ -48,8 +40,11 @@ void CgiBinRequest::run() {
 }
 
 char *CgiBinRequest::getFilePath() {
-    char *originalPath = (char*)filePath.c_str();
+    char *originalPath = (char*)filePath->c_str();
     char *end = index(originalPath, '?');
+    if(end == nullptr) {
+        end = originalPath + strlen(originalPath);
+    }
     int delta = (int) (end - originalPath);
     char *path = new char[strlen(CGI_BIN_FOLDER) + delta + 1];
     strcpy(path, CGI_BIN_FOLDER);
@@ -61,8 +56,8 @@ void CgiBinRequest::listen() {
     close(link[1]); // write
     _ssize_t bytes = 1;
     _ssize_t total = 0;
-    wait(nullptr); // should we wait first or consume/wait?
 
+    wait(nullptr); // should we wait first or consume/wait?
     while (bytes > 0) {
         memset(buffer, '\0', BUFFER_SIZE);
         bytes = read(link[0], buffer, BUFFER_SIZE);
@@ -78,6 +73,11 @@ void CgiBinRequest::listen() {
 }
 
 void CgiBinRequest::solve() {
+    if (pipe(link) < 0) {
+        perror("pipe");
+        exit(errno);
+    }
+
     pid_t pid = fork();
 
     if (pid == 0) { // child
@@ -111,7 +111,6 @@ char **CgiBinRequest::getEnvironment() {
     }
 
     env[vars] = nullptr;
-
     return env;
 }
 
