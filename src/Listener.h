@@ -12,19 +12,16 @@ class Listener {
 private:
     int connectionFd = 0;
 public:
-
+    /// \param connectionFd - descriptor of connection to listen
     Listener(int connectionFd);
 
-    uint16_t getPort() const;
-
-    int getListenFd() const;
-
+    /// \return - connection file descriptor used in this listener
     int getConnectionFd() const;
 
-    const sockaddr_in &getServerAddress() const;
-
+    /// \return - HTTPRequest object representing current request received
     HTTPRequest *readRequest();
 
+    /// Closes connection
     void close();
 };
 

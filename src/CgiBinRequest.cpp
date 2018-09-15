@@ -73,10 +73,9 @@ void CgiBinRequest::listen() {
 }
 
 void CgiBinRequest::solve() {
-    if (pipe(link) < 0) {
-        perror("pipe");
-        exit(errno);
-    }
+    createPipe();
+
+    debugEnvironmentVariables();
 
     pid_t pid = fork();
 
@@ -87,13 +86,28 @@ void CgiBinRequest::solve() {
     }
 }
 
+void CgiBinRequest::createPipe() {
+    if (pipe(link) < 0) {
+        perror("pipe");
+        exit(errno);
+    }
+}
+
+void CgiBinRequest::debugEnvironmentVariables() {
+    auto env = getEnvironment();
+
+    printf("Debugging environment variables...\n");
+    while(*env) {
+        printf("(%s)", *env);
+        env++;
+    }
+    printf("Ended env-vars debugging\n");
+}
+
 char *CgiBinRequest::getResponse() {
     return (char *) this->response->c_str();
 }
 
-void CgiBinRequest::setEnvironmentVariables(char **envp) {
-    this->baseEnvironment = envp;
-}
 
 char **CgiBinRequest::getEnvironment() {
     int vars = getTotalEnvironmentCount();
@@ -101,8 +115,8 @@ char **CgiBinRequest::getEnvironment() {
 
     vars = 0;
 
-    while (this->baseEnvironment[vars] != nullptr) {
-        env[vars] = this->baseEnvironment[vars];
+    while (environ[vars] != nullptr) {
+        env[vars] = environ[vars];
         vars++;
     }
     for (int i = 0; i < this->extendedEnvironment->size(); ++i) {
@@ -122,12 +136,22 @@ int CgiBinRequest::getTotalEnvironmentCount() const {
 
 int CgiBinRequest::getBaseEnvironmentCount() const {
     int vars = 0;
-    while (baseEnvironment[vars] != nullptr) {
+    while (environ[vars] != nullptr) {
         vars++;
     }
     return vars;
 }
 
+void CgiBinRequest::addEnvironmentVariableS(string key, char *value) {
+    char *env = new char[strlen(key.c_str()) + strlen(value) + 2];
+
+    // snprintf pls
+    strcpy(env, key.c_str());
+    strcat(env, "=");
+    strcat(env, value);
+
+    this->extendedEnvironment->push_back(env);
+}
 void CgiBinRequest::addEnvironmentVariable(char *key, char *value) {
     char *env = new char[strlen(key) + strlen(value) + 2];
 

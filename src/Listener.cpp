@@ -18,37 +18,37 @@ Listener::Listener(int connectionFd) {
 
 HTTPRequest *Listener::readRequest() {
 
-    auto bufferSize = (_ssize_t) 1024;
+    // TODO: use strings to avoid manually handling buffer
+    // TODO: continuous reading to avoid overflowing big requests
+    auto bufferSize = (size_t) 1024;
     char buffer[bufferSize + 1];
     memset(buffer, '\0', bufferSize);
     auto requestBytesTotal = (_ssize_t) 0;
     auto requestBytes = (_ssize_t) bufferSize;
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {
-        printf("Waiting for bytes...\n");
-        requestBytes = read(connectionFd, buffer, (size_t) bufferSize);
-        printf("Received bytes!\n");
+        printf("Reading request... ");
+        requestBytes = read(connectionFd, buffer, bufferSize);
 
         if (requestBytes < 0) {
-            printf("Error reading message: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            printf("ERROR: %s\n", strerror(errno));
+
+            return nullptr;
         } else {
             printf("Read %d bytes\n", (int) requestBytes);
             requestBytesTotal += requestBytes;
         }
     }
 
-    printf("Entire request was %d bytes.\n", (int) requestBytesTotal);
+    printf("Request total size: %d bytes.\n", (int) requestBytesTotal);
 
     auto *hp = new HTTPRequest(buffer);
 
-    if (hp->countRequestLines() == 0) {
+    if (hp->getRequestLineCount() == 0) {
         return nullptr;
     }
 
-    printf("Request method: %s\n", hp->getRequestLine(REQUEST_METHOD));
-    printf("Request URI: %s\n", hp->getRequestLine(REQUEST_URI));
-    printf("Request protocol: %s\n", hp->getRequestLine(REQUEST_PROTOCOL));
+    printf("Request: %s\n", hp->getRequestLine());
 
     return hp;
 
@@ -61,5 +61,5 @@ int Listener::getConnectionFd() const {
 void Listener::close() {
     // Avoids ERR_CONNECTION_RESET on Chrome
     printf("Closing connection\n");
-    close(connectionFd);
+    ::close(connectionFd);
 }

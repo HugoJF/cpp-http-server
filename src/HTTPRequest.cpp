@@ -8,24 +8,27 @@
 
 HTTPRequest::HTTPRequest(char *rawRequest) {
     this->rawRequest = copyString(rawRequest);
+    requestLine = new char *[3];
 
     parse();
 }
 
-char *HTTPRequest::copyString(const char *rawRequest) {
-    char *clone = (char *) malloc(sizeof(char) * (strlen(rawRequest) + 1));
-    memcpy(clone, rawRequest, sizeof(char) * (strlen(rawRequest) + 1));
+char *HTTPRequest::copyString(const char *string) {
+    char *clone = new char[strlen(string) + 1];
+
+    strcpy(clone, string);
 
     return clone;
 }
 
 char *HTTPRequest::copyRawRequest() {
-    return copyString(this->rawRequest);
+    return copyString(rawRequest);
 }
-
 
 void HTTPRequest::parse() {
     int count = countRequestLines();
+
+    printf("Parsed %d request lines.\n", count);
 
     if (count > 0) {
         splitRequest();
@@ -43,7 +46,6 @@ int HTTPRequest::countRequestLines() {
         movingPtr++;
     }
     if (count > 0) {
-        printf("Request line count: %d\n", count);
         requestLineCount = count;
         headerCount = count - 1;
         requestParts = new char *[count];
@@ -52,6 +54,10 @@ int HTTPRequest::countRequestLines() {
     } else {
         return 0;
     }
+}
+
+int HTTPRequest::getRequestLineCount() const {
+    return requestLineCount;
 }
 
 void HTTPRequest::splitRequest() {
@@ -75,14 +81,14 @@ char *HTTPRequest::getLine(int line) {
 
 
 void HTTPRequest::parseRequestLine() {
-    requestLine = new char *[3];
     char *piece = nullptr;
-    int part = 0;
-    piece = strtok(getRequestLine(), " ");
-    while (piece != nullptr) {
-        requestLine[part++] = piece;
-        piece = strtok(nullptr, " ");
-    }
+    char *request = new char[strlen(getRequestLine()) + 1];
+    strcpy(request, getRequestLine());
+
+    requestLine[0] = strtok(request, " ");
+    requestLine[1] = strtok(nullptr, " ");
+    requestLine[2] = strtok(nullptr, " ");
+
 }
 
 void HTTPRequest::parseRequestHeader() {
@@ -98,13 +104,13 @@ char *HTTPRequest::getRequestLine(int i) {
 }
 
 void HTTPRequest::parserHeader(int i) {
-    char *key;
-    char *value;
-    key = strtok(getRawHeader(i), ":");
-    value = strtok(nullptr, ":");
     headers[i] = new char *[2];
-    headers[i][0] = key;
-    headers[i][1] = value;
+    char *header = new char[strlen(getRawHeader(i))];
+
+    strcpy(header, getRawHeader(i));
+
+    headers[i][0] = strtok(header, ":");
+    headers[i][1] = strtok(nullptr, ":");
 }
 
 char *HTTPRequest::getRawHeader(int i) {
@@ -121,22 +127,24 @@ char *HTTPRequest::getHeaderValue(int i) {
 
 char **HTTPRequest::getHeaderValue(const char *string) {
     char **head;
+
     for (int i = 0; i < headerCount; ++i) {
         head = getHeader(i);
         if (strcmp(string, head[0]) == 0) {
             return head;
         }
     }
+
     return nullptr;
 }
 
 char *HTTPRequest::getQueryString() {
     char *uri = this->getRequestLine(REQUEST_URI);
 
-    // Get pointer to characters following '?'
+    // Get pointer to characters after '?'
     char *start = index(uri, '?');
 
-    // If there are no parameters
+    // If there are no parameters point to end of string (no query string)
     if (start == nullptr) {
         start = uri + strlen(uri);
     } else {

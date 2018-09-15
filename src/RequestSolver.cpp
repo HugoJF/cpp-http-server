@@ -32,11 +32,6 @@ void RequestSolver::process() {
 
     char *piece;
     int i = -1;
-//    piece = strtok(copy, "/");
-//    while (piece != nullptr) {
-//        segments[i++] = piece;
-//        piece = strtok(nullptr, "/");
-//    }
 
     while ((piece = strsep(&copy, "/")) != nullptr) {
         if (i == -1) {

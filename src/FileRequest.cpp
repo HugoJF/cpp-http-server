@@ -19,10 +19,11 @@ FileRequest::FileRequest(char *filePath) {
 char *FileRequest::resolveFilePath(char *filePath) {
     char *fullPath = buildPath(filePath);
 
-    printf("Full path for file: %s\n", fullPath);
+    printf("Path to file: %s\n", fullPath);
 
     if (stat(this->buildPath(filePath), sb) == -1) {
-        perror("resolveFilePath()");
+        printf("Error stating file %s\n", filePath);
+        perror("FileRequest::resolveFilePath() stat()");
         return nullptr;
     }
     if (sb != nullptr) {
