@@ -5,7 +5,7 @@
 #ifndef SIMPLE_HTTP_SERVER_HTTPREQUEST_H
 #define SIMPLE_HTTP_SERVER_HTTPREQUEST_H
 
-#include <src/HeaderBuilder.h>
+#include "HeaderBuilder.h"
 
 #define REQUEST_METHOD 0
 #define REQUEST_URI 1

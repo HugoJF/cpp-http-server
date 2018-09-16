@@ -8,8 +8,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
-#include <src/HTTPRequest.h>
-#include <src/Listener.h>
+#include "HTTPRequest.h"
+#include "Listener.h"
 
 Listener::Listener(int connectionFd) {
     this->connectionFd = connectionFd;
@@ -22,8 +22,8 @@ HTTPRequest *Listener::readRequest() {
     auto bufferSize = (size_t) 1024;
     char buffer[bufferSize + 1];
     memset(buffer, '\0', bufferSize);
-    auto requestBytesTotal = (_ssize_t) 0;
-    auto requestBytes = (_ssize_t) bufferSize;
+    auto requestBytesTotal =  0;
+    auto requestBytes = bufferSize;
 
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {

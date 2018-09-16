@@ -11,17 +11,18 @@
 #include <string.h>
 #include <cerrno>
 #include "CgiBinRequest.h"
-#include <src/HTTPRequest.h>
+#include "HTTPRequest.h"
 
-#define BUFFER_SIZE 4096
-#define CGI_BIN_FOLDER ".."
+#define BUFFER_SIZE 1024
+#define CGI_BIN_FOLDER "/home/hugo/cpp-http-server-master"
 // TODO: Avoid using fixed buffer, if response is bigger than BUFFER_SIZE overflow will occur
 
 CgiBinRequest::CgiBinRequest(char *filePath, HTTPRequest *httpRequest) {
     this->httpRequest = httpRequest;
     this->buffer = new char[BUFFER_SIZE];
-    this->extendedEnvironment = new vector<string>();
-    this->argv = new char *[1];
+    this->buffer = (char *) malloc(sizeof(char) * BUFFER_SIZE);
+    this->extendedEnvironment = new vector<string>;
+    this->argv = new char *[10];
     this->filePath = new string(filePath);
     this->response = new string;
     argv[0] = nullptr;
@@ -54,8 +55,8 @@ char *CgiBinRequest::getFilePath() {
 
 void CgiBinRequest::listen() {
     close(link[1]); // write
-    _ssize_t bytes = 1;
-    _ssize_t total = 0;
+    int bytes = 1;
+    int total = 0;
 
     wait(nullptr); // should we wait first or consume/wait?
     while (bytes > 0) {
@@ -97,7 +98,7 @@ void CgiBinRequest::debugEnvironmentVariables() {
     auto env = getEnvironment();
 
     printf("Debugging environment variables...\n");
-    while(*env) {
+    while (*env) {
         printf("(%s)", *env);
         env++;
     }
@@ -111,13 +112,17 @@ char *CgiBinRequest::getResponse() {
 
 char **CgiBinRequest::getEnvironment() {
     int vars = getTotalEnvironmentCount();
-    char **env = new char *[vars + 1]; // nullptr terminator
+//    char **env = new char *[vars + 1]; // nullptr terminator
+    char **env = (char **) malloc(sizeof(char *) * (vars + 1));
     char *temp = nullptr;
 
     vars = 0;
 
     while (environ[vars] != nullptr) {
-        temp = new char[strlen(environ[vars]) + 1];
+//        temp = new char[strlen(environ[vars]) + 1];
+        char *e = environ[vars];
+        int size = strlen(e);
+        temp = (char *) malloc(sizeof(char) * (size + 1));
         strcpy(temp, environ[vars]);
         env[vars] = temp;
         vars++;
@@ -155,6 +160,7 @@ void CgiBinRequest::addEnvironmentVariableS(string key, char *value) {
 
     this->extendedEnvironment->push_back(env);
 }
+
 void CgiBinRequest::addEnvironmentVariable(char *key, char *value) {
     char *env = new char[strlen(key) + strlen(value) + 2];
 

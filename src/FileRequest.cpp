@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#define HTDOCS_PATH "../htdocs"
+#define HTDOCS_PATH "htdocs"
 
 FileRequest::FileRequest(char *filePath) {
     sb = new struct stat;
@@ -59,8 +59,8 @@ int FileRequest::solve() {
     char *buffer = new char[bufferSize];
     memset(buffer, '\0', sizeof(char) * bufferSize);
 
-    auto readBytesTotal = (_ssize_t) 0;
-    auto readBytes = (_ssize_t) bufferSize;
+    auto readBytesTotal = 0;
+    auto readBytes =  bufferSize;
 
     while (readBytes >= bufferSize) {
         printf("#### Reading data file...\n");

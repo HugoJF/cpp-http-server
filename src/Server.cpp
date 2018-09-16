@@ -1,16 +1,18 @@
 #include <string.h> // memset
 #include <unistd.h>
 #include <string.h>
-#include <src/HTTPRequest.h>
-#include <src/Listener.h>
-#include <src/Worker.h>
-#include <src/HeaderBuilder.h>
-#include <src/FileRequest.h>
-#include <src/RequestSolver.h>
-#include <src/CgiBinRequest.h>
+#include <signal.h>
+#include "HTTPRequest.h"
+#include "pthread.h"
+#include "Listener.h"
+#include "Worker.h"
+#include "HeaderBuilder.h"
+#include "FileRequest.h"
+#include "RequestSolver.h"
+#include "CgiBinRequest.h"
 
-#define PORT 8080
-#define MAX_CONNECTIONS 5000
+#define PORT 8889
+#define MAX_CONNECTIONS 5000000
 #define USE_THREADS 0
 #define REDIRECT_STDERR 1
 

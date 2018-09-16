@@ -5,8 +5,8 @@
 #ifndef SIMPLE_HTTP_SERVER_WORKER_H
 #define SIMPLE_HTTP_SERVER_WORKER_H
 
-#include <src/HTTPRequest.h>
-#include <src/Listener.h>
+#include "HTTPRequest.h"
+#include "Listener.h"
 
 class Worker {
 public:

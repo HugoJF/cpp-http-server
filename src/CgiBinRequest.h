@@ -5,7 +5,7 @@
 #ifndef SIMPLE_HTTP_SERVER_CGIBINREQUEST_H
 #define SIMPLE_HTTP_SERVER_CGIBINREQUEST_H
 
-#include <src/HTTPRequest.h>
+#include "HTTPRequest.h"
 #include <vector>
 #include <string>
 
