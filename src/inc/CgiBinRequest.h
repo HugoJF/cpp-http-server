@@ -66,7 +66,7 @@ public:
     /// Adds new environment variable to CGI script (this is only used to workaround stupid C++ string/char* confusion)
     /// \param key - variable key
     /// \param value - variable value
-    void addEnvironmentVariableS(string key, char *value);
+    void addEnvironmentVariables(string key, char *value);
 
     /// Counts base environment variables
     int getBaseEnvironmentCount() const;
@@ -79,6 +79,8 @@ public:
 
     /// Creates new pipe for parent-child process communication
     void createPipe();
+
+    virtual ~CgiBinRequest();
 };
 
 

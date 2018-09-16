@@ -19,24 +19,35 @@
 
 CgiBinRequest::CgiBinRequest(char *filePath, HTTPRequest *httpRequest) {
     this->httpRequest = httpRequest;
-    this->buffer = new char[BUFFER_SIZE];
+    this->buffer = new char[BUFFER_SIZE + 1];
     this->extendedEnvironment = new vector<string>;
     this->argv = new char *[1];
     this->filePath = new string(filePath);
-    this->response = new string;
+    this->response = new string();
 
     argv[0] = nullptr;
-    printf("CGI-BIN Path: %s\n", this->getFilePath());
+
+    char *f = this->getFilePath();
+    printf("CGI-BIN Path: %s\n", f);
+    delete f;
+}
+
+CgiBinRequest::~CgiBinRequest() {
+    delete[] this->buffer;
+    delete[] this->argv;
+    this->extendedEnvironment->clear();
 }
 
 void CgiBinRequest::run() {
     dup2(link[1], STDOUT_FILENO);
     close(link[0]); // read
     close(link[1]); // write
-    if (execve(getFilePath(), argv, getEnvironment()) == -1) {
+    char *path = getFilePath();
+    if (execve(path, argv, getEnvironment()) == -1) {
         perror("execv() from run() in CgiBinRequest");
         exit(errno);
     }
+    delete path;
     exit(0);
 }
 
@@ -60,7 +71,7 @@ void CgiBinRequest::listen() {
 
     wait(nullptr); // should we wait first or consume/wait?
     while (bytes > 0) {
-        memset(buffer, '\0', BUFFER_SIZE);
+        memset(buffer, '\0', BUFFER_SIZE + 1);
         bytes = read(link[0], buffer, BUFFER_SIZE);
 
         if (bytes < 0) {
@@ -115,22 +126,27 @@ char **CgiBinRequest::getEnvironment() {
     char **env = new char *[vars + 1]; // nullptr terminator
     char *temp = nullptr;
 
-    vars = 0;
+    int i = 0;
 
-    while (environ[vars] != nullptr) {
-        temp = new char[strlen(environ[vars]) + 1];
-        char *e = environ[vars];
-        int size = strlen(e);
-        strcpy(temp, environ[vars]);
-        env[vars] = temp;
-        vars++;
+    while (environ[i] != nullptr) {
+        temp = new char[strlen(environ[i]) + 1];
+        strcpy(temp, environ[i]);
+        env[i] = temp;
+        i++;
     }
-    for (int i = 0; i < this->extendedEnvironment->size(); ++i) {
-        env[vars] = (char *) this->extendedEnvironment->at(i).c_str();
-        vars++;
+    for (int j = 0; j < this->extendedEnvironment->size(); ++j) {
+        env[i] = (char *) this->extendedEnvironment->at(j).c_str();
+        i++;
     }
 
-    env[vars] = nullptr;
+    env[i] = nullptr;
+
+    // Check for array overfloww
+    if(i != vars) {
+        printf("Expected set and allocated number of variables to be equal. %d != %d\n", i, vars);
+        exit(99);
+    }
+
     return env;
 }
 
@@ -148,21 +164,13 @@ int CgiBinRequest::getBaseEnvironmentCount() const {
     return vars;
 }
 
-void CgiBinRequest::addEnvironmentVariableS(string key, char *value) {
-    char *env = new char[strlen(key.c_str()) + strlen(value) + 2];
-
-    // snprintf pls
-    strcpy(env, key.c_str());
-    strcat(env, "=");
-    strcat(env, value);
-
-    this->extendedEnvironment->push_back(env);
+void CgiBinRequest::addEnvironmentVariables(string key, char *value) {
+    addEnvironmentVariable((char*) key.c_str(), value);
 }
 
 void CgiBinRequest::addEnvironmentVariable(char *key, char *value) {
-    char *env = new char[strlen(key) + strlen(value) + 2];
+    char *env = new char[strlen(key) + strlen(value) + 2]; // '=' and \0
 
-    // snprintf pls
     strcpy(env, key);
     strcat(env, "=");
     strcat(env, value);
