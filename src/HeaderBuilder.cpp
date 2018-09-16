@@ -2,7 +2,7 @@
 // Created by Hugo on 8/31/2018.
 //
 
-#include "HeaderBuilder.h"
+#include "inc/HeaderBuilder.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -10,8 +10,8 @@
 #include <cstdlib>
 #include <string.h>
 #include <cerrno>
-#include "CgiBinRequest.h"
-#include "HTTPRequest.h"
+#include "inc/CgiBinRequest.h"
+#include "inc/HTTPRequest.h"
 
 #define BUFFER_SIZE 1024
 #define CGI_BIN_FOLDER "/home/hugo/cpp-http-server"

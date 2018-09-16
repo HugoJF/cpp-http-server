@@ -7,10 +7,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include "Worker.h"
-#include "FileRequest.h"
-#include "RequestSolver.h"
-#include "CgiBinRequest.h"
+#include "inc/Worker.h"
+#include "inc/FileRequest.h"
+#include "inc/RequestSolver.h"
+#include "inc/CgiBinRequest.h"
 
 #define BUFFER_SIZE 5000
 #define INDEX_APPEND "/index.html"

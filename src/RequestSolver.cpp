@@ -2,7 +2,7 @@
 // Created by Hugo on 9/1/2018.
 //
 
-#include "RequestSolver.h"
+#include "inc/RequestSolver.h"
 #include <string.h>
 
 RequestSolver::RequestSolver(char *uri) {

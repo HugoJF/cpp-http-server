@@ -2,8 +2,8 @@
 // Created by Hugo on 8/30/2018.
 //
 
-#include "HTTPRequest.h"
-#include "HeaderBuilder.h"
+#include "inc/HTTPRequest.h"
+#include "inc/HeaderBuilder.h"
 #include <iostream>
 #include <string.h>
 

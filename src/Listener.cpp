@@ -4,12 +4,12 @@
 
 #include <iostream>
 #include <sys/socket.h>
-#include <cstring>
+#include <string.h>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
-#include "HTTPRequest.h"
-#include "Listener.h"
+#include "inc/HTTPRequest.h"
+#include "inc/Listener.h"
 
 Listener::Listener(int connectionFd) {
     this->connectionFd = connectionFd;
@@ -24,7 +24,6 @@ HTTPRequest *Listener::readRequest() {
     memset(buffer, '\0', bufferSize);
     auto requestBytesTotal =  0;
     auto requestBytes = bufferSize;
-
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {
         printf("Reading request... ");

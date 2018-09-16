@@ -2,7 +2,7 @@
 // Created by Hugo on 8/31/2018.
 //
 
-#include "FileRequest.h"
+#include "inc/FileRequest.h"
 #include <iostream>
 #include <string.h>
 #include <unistd.h>

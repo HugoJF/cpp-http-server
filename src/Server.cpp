@@ -2,14 +2,14 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
-#include "HTTPRequest.h"
 #include "pthread.h"
-#include "Listener.h"
-#include "Worker.h"
-#include "HeaderBuilder.h"
-#include "FileRequest.h"
-#include "RequestSolver.h"
-#include "CgiBinRequest.h"
+#include "inc/HTTPRequest.h"
+#include "inc/Listener.h"
+#include "inc/Worker.h"
+#include "inc/HeaderBuilder.h"
+#include "inc/FileRequest.h"
+#include "inc/RequestSolver.h"
+#include "inc/CgiBinRequest.h"
 
 #define PORT 8889
 #define MAX_CONNECTIONS 5000000
