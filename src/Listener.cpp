@@ -56,6 +56,16 @@ HTTPRequest *Listener::readRequest() {
 
 }
 
+void Listener::sendResponse(const char *response) {
+    int bytesToSend = sizeof(char) * strlen(response);
+    ssize_t bytesSent = 0;
+
+    while (bytesToSend > 0) {
+        bytesSent = send(getConnectionFd(), response + (strlen(response) - bytesToSend), sizeof(char) * bytesToSend, 0);
+        bytesToSend -= bytesSent;
+    }
+}
+
 int Listener::getConnectionFd() const {
     return connectionFd;
 }

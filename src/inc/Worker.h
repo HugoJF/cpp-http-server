@@ -23,10 +23,9 @@ public:
     /// Solves given HTTP request
     void work();
 
-private:
-    /// \param response - full response to send to client
-    /// \param fd - what connection to use
-    void sendResponseToClient(char *response, int fd);
+    char *serveCgiBin(char *fixedUri) const;
+
+    char *serveStaticFile(char *fixedUri) const;
 };
 
 #endif //SIMPLE_HTTP_SERVER_WORKER_H

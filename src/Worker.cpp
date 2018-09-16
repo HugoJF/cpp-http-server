@@ -11,6 +11,7 @@
 #include "inc/FileRequest.h"
 #include "inc/RequestSolver.h"
 #include "inc/CgiBinRequest.h"
+#include "inc/HeaderBuilder.h"
 
 #define BUFFER_SIZE 5000
 #define INDEX_APPEND "/index.html"
@@ -61,41 +62,55 @@ void Worker::work() {
     }
 
     if (rs->isCgiBin() || forceCgiBin) {
-        printf("Request is inside CGI-BIN directory.\n");
-        auto *cgi = new CgiBinRequest(fixedUri, httpRequest);
-
-        cgi->addEnvironmentVariables(("PATH_INFO"), httpRequest->getRequestLine(REQUEST_URI));
-        cgi->addEnvironmentVariables("QUERY_STRING", httpRequest->getQueryString());
-        cgi->solve();
-
-        response = cgi->getResponse();
+        response = serveCgiBin(fixedUri);
     } else {
-        printf("Request is for static file.\n");
-        auto *fr = new FileRequest(fixedUri);
-
-        fr->solve();
-
-        response = fr->getResponse();
+        response = serveStaticFile(fixedUri);
     }
 
     if (response == nullptr) {
         printf("Could not send response to client: NULL response\n");
     } else {
         printf("Returning response contains %d bytes.\n", (int) strlen(response));
-        sendResponseToClient(response, listener->getConnectionFd());
+        listener->sendResponse(response);
     }
 
     delete response;
     delete rs;
 }
 
+char *Worker::serveStaticFile(char *fixedUri) const {
+    char *response;
+    printf("Request is for static file.\n");
+    auto *fr = new FileRequest(fixedUri);
+    auto *rb = new HeaderBuilder();
+    string *res = new string();
 
-void Worker::sendResponseToClient(char *response, int fd) {
-    int bytesToSend = sizeof(char) * strlen(response);
-    ssize_t bytesSent = 0;
+    char *fileContent = fr->getResponse();
 
-    while (bytesToSend > 0) {
-        bytesSent = send(fd, response + (strlen(response) - bytesToSend), sizeof(char) * bytesToSend, 0);
-        bytesToSend -= bytesSent;
-    }
+    fr->solve();
+    rb->addHeader("Content-Type", "text/html");
+    rb->addHeader("Content-Length", (char*) std::to_string(strlen(fileContent)).c_str());
+
+    char *headers = rb->render();
+
+    res->append("HTTP/1.1 200 OK");
+    res->append(rb->render());
+    res->append("\r\n");
+    res->append(fr->getResponse());
+
+    response = (char *) res->c_str();
+    return response;
+}
+
+char *Worker::serveCgiBin(char *fixedUri) const {
+    char *response;
+    printf("Request is inside CGI-BIN directory.\n");
+    auto *cgi = new CgiBinRequest(fixedUri, httpRequest);
+
+    cgi->addEnvironmentVariables(("PATH_INFO"), httpRequest->getRequestLine(REQUEST_URI));
+    cgi->addEnvironmentVariables("QUERY_STRING", httpRequest->getQueryString());
+    cgi->solve();
+
+    response = cgi->getResponse();
+    return response;
 }
