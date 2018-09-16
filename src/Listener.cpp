@@ -63,7 +63,6 @@ int Listener::getConnectionFd() const {
 }
 
 void Listener::close() {
-    // Avoids ERR_CONNECTION_RESET on Chrome
     printf("Closing connection\n");
     ::close(connectionFd);
 }

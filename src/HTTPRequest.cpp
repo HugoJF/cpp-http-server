@@ -10,14 +10,13 @@
 HTTPRequest::HTTPRequest(char *rawRequest) {
     this->rawRequest = copyString(rawRequest);
     this->headers = new HeaderBuilder();
-    requestLine = new char *[300];
+    requestLine = new char *[3];
 
     parse();
 }
 
 char *HTTPRequest::copyString(const char *string) {
-//    char *clone = new char[strlen(string) + 100];
-    char *clone = (char *) malloc(sizeof(char) * (strlen(string) + 100));
+    char *clone = new char[strlen(string) + 1];
 
     strcpy(clone, string);
 
@@ -104,8 +103,8 @@ char *HTTPRequest::getRequestLine(int i) {
 }
 
 void HTTPRequest::parserHeader(int i) {
-//    char *header = new char[strlen(getRawHeader(i))];
-    char *header = (char *) malloc(sizeof(char) * (strlen(getRawHeader(i)) + 1));
+    char *header = new char[strlen(getRawHeader(i))];
+
     strcpy(header, getRawHeader(i));
 
     char *key = strtok(header, ":");

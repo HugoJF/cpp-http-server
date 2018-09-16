@@ -78,7 +78,10 @@ int main(int argc, char *args[], char *arge[]) {
 #else
         dispatchThread((void *) &connectionDescriptor);
 #endif
+        close(connectionDescriptor);
     }
+
+    close(listenFd);
 }
 
 void *dispatchThread(void *args) {
@@ -150,7 +153,7 @@ int accept() {
 }
 
 void handleSignal(int signum) {
-    printf("Receiving signal %d\n");
+    printf("->Receiving signal %d\n");
 }
 
 void registerSignalHandler() {

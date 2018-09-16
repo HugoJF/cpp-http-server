@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#define HTDOCS_PATH "htdocs"
+#define HTDOCS_PATH "../htdocs"
 
 FileRequest::FileRequest(char *filePath) {
     sb = new struct stat;

@@ -14,17 +14,17 @@
 #include "HTTPRequest.h"
 
 #define BUFFER_SIZE 1024
-#define CGI_BIN_FOLDER "/home/hugo/cpp-http-server-master"
+#define CGI_BIN_FOLDER "/home/hugo/cpp-http-server"
 // TODO: Avoid using fixed buffer, if response is bigger than BUFFER_SIZE overflow will occur
 
 CgiBinRequest::CgiBinRequest(char *filePath, HTTPRequest *httpRequest) {
     this->httpRequest = httpRequest;
     this->buffer = new char[BUFFER_SIZE];
-    this->buffer = (char *) malloc(sizeof(char) * BUFFER_SIZE);
     this->extendedEnvironment = new vector<string>;
-    this->argv = new char *[10];
+    this->argv = new char *[1];
     this->filePath = new string(filePath);
     this->response = new string;
+
     argv[0] = nullptr;
     printf("CGI-BIN Path: %s\n", this->getFilePath());
 }
@@ -112,17 +112,15 @@ char *CgiBinRequest::getResponse() {
 
 char **CgiBinRequest::getEnvironment() {
     int vars = getTotalEnvironmentCount();
-//    char **env = new char *[vars + 1]; // nullptr terminator
-    char **env = (char **) malloc(sizeof(char *) * (vars + 1));
+    char **env = new char *[vars + 1]; // nullptr terminator
     char *temp = nullptr;
 
     vars = 0;
 
     while (environ[vars] != nullptr) {
-//        temp = new char[strlen(environ[vars]) + 1];
+        temp = new char[strlen(environ[vars]) + 1];
         char *e = environ[vars];
         int size = strlen(e);
-        temp = (char *) malloc(sizeof(char) * (size + 1));
         strcpy(temp, environ[vars]);
         env[vars] = temp;
         vars++;

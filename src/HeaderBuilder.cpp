@@ -17,15 +17,15 @@ HeaderBuilder::HeaderBuilder() {
 void HeaderBuilder::resizeArray() {
     if (allocatedHeaders == 0) {
         allocatedHeaders = INITIAL_COUNT;
-        headers = (Header **) malloc(sizeof(Header *) * allocatedHeaders);
+        headers = new Header *[allocatedHeaders];
         for (int i = 0; i < INITIAL_COUNT; ++i) {
-            headers[i] = (Header *) malloc(sizeof(Header));
+            headers[i] = new Header();
         }
     } else if (headerCount == allocatedHeaders) {
         allocatedHeaders *= REALLOC_MULTIPLIER;
         headers = (Header **) realloc(headers, sizeof(Header *) * allocatedHeaders);
         for (int i = allocatedHeaders / REALLOC_MULTIPLIER; i < allocatedHeaders; ++i) {
-            headers[i] = (Header *) malloc(sizeof(Header));
+            headers[i] = new Header();
         }
     }
 }
@@ -66,7 +66,7 @@ int HeaderBuilder::computeHeaderSize() {
 
 char *HeaderBuilder::render() {
     int computedSize = computeHeaderSize();
-    char *render = (char *) malloc(sizeof(char) * (computedSize + 1));
+    char *render = new char[computedSize + 1];
     memset(render, 'a', computedSize + 1);
     char *current = render;
     size_t aux;
