@@ -20,12 +20,14 @@ void HeaderBuilder::resizeArray() {
         headers = new Header *[allocatedHeaders];
         for (int i = 0; i < INITIAL_COUNT; ++i) {
             headers[i] = new Header();
+//            headers[i] = (Header*)malloc(sizeof(Header*));
         }
     } else if (headerCount == allocatedHeaders) {
         allocatedHeaders *= REALLOC_MULTIPLIER;
         headers = (Header **) realloc(headers, sizeof(Header *) * allocatedHeaders);
         for (int i = allocatedHeaders / REALLOC_MULTIPLIER; i < allocatedHeaders; ++i) {
             headers[i] = new Header();
+//            headers[i] = (Header*)malloc(sizeof(Header*));
         }
     }
 }
