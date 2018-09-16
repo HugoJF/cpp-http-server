@@ -56,7 +56,7 @@ int FileRequest::solve() {
     }
 
     int bufferSize = sizeof(char) * (sb->st_size + 1); // +1 for \0
-    char *buffer = new char[bufferSize];
+    char *buffer = new char[bufferSize + 1];
     memset(buffer, '\0', sizeof(char) * bufferSize);
 
     auto readBytesTotal = 0;

@@ -103,7 +103,7 @@ char *HTTPRequest::getRequestLine(int i) {
 }
 
 void HTTPRequest::parserHeader(int i) {
-    char *header = new char[strlen(getRawHeader(i))];
+    char *header = new char[strlen(getRawHeader(i)) + 1];
 
     strcpy(header, getRawHeader(i));
 
@@ -143,9 +143,11 @@ char *HTTPRequest::getQueryString() {
     // Calculate how many chars to the end of string + null terminator
     int delta = (int) (end - start) + 1;
     // Allocate string
-    char *result = new char[delta];
+    char *result = new char[delta + 1];
     // Copy piece of memory
     memcpy(result, start, (size_t) delta);
+    // Null-terminator
+    result[delta] = '\0';
 
     return result;
 }

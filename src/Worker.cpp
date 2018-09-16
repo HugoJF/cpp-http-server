@@ -37,8 +37,9 @@ void Worker::work() {
     if (rs->isDirectory()) {
         // TODO: check for trailing slash to avoid // or no slash
         // append index.html to request if file exists
-        fixedUri = new char[strlen(uri) + strlen(INDEX_APPEND)];
-        sprintf(fixedUri, "%s%s", uri, INDEX_APPEND);
+        fixedUri = new char[strlen(uri) + strlen(INDEX_APPEND) + 1];
+        strcpy(fixedUri, uri);
+        strncat(fixedUri, INDEX_APPEND, sizeof(INDEX_APPEND));
 
         // check for index.html
         auto *indexRequest = new FileRequest(fixedUri);
@@ -47,7 +48,7 @@ void Worker::work() {
 
         if (result != 0) {
             delete fixedUri;
-            fixedUri = new char[strlen("/cgi-bin/dir.py")];
+            fixedUri = new char[strlen("/cgi-bin/dir.py") + 1];
             sprintf(fixedUri, "%s", "/cgi-bin/dir.py");
             printf("Could not find index.html, directing to dir.py to list directory.\n");
             forceCgiBin = true;
@@ -63,8 +64,8 @@ void Worker::work() {
         printf("Request is inside CGI-BIN directory.\n");
         auto *cgi = new CgiBinRequest(fixedUri, httpRequest);
 
-        cgi->addEnvironmentVariableS(("PATH_INFO"), httpRequest->getRequestLine(REQUEST_URI));
-        cgi->addEnvironmentVariableS("QUERY_STRING", httpRequest->getQueryString());
+        cgi->addEnvironmentVariables(("PATH_INFO"), httpRequest->getRequestLine(REQUEST_URI));
+        cgi->addEnvironmentVariables("QUERY_STRING", httpRequest->getQueryString());
         cgi->solve();
 
         response = cgi->getResponse();
@@ -84,6 +85,7 @@ void Worker::work() {
         sendResponseToClient(response, listener->getConnectionFd());
     }
 
+    delete response;
     delete rs;
 }
 
