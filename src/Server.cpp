@@ -51,6 +51,7 @@ int main(int argc, char *args[], char *arge[]) {
     // Keep-Alive connection support
     // Content-Length support
     // Content-Type support
+    // Use vector in HeaderBuilder
 
     registerSignalHandler();
     removeStdoutBuffering();

@@ -16,14 +16,12 @@ Listener::Listener(int connectionFd) {
 }
 
 HTTPRequest *Listener::readRequest() {
-
-    // TODO: use strings to avoid manually handling buffer
-    // TODO: continuous reading to avoid overflowing big requests
     auto bufferSize = (size_t) 1024;
     char buffer[bufferSize + 1];
     memset(buffer, '\0', bufferSize);
     auto requestBytesTotal =  0;
     auto requestBytes = bufferSize;
+    auto request = new std::string();
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {
         printf("Reading request... ");
@@ -36,6 +34,7 @@ HTTPRequest *Listener::readRequest() {
         } else {
             printf("Read %d bytes\n", (int) requestBytes);
             requestBytesTotal += requestBytes;
+            request->append(buffer, requestBytes);
         }
     }
 
@@ -45,7 +44,7 @@ HTTPRequest *Listener::readRequest() {
         return nullptr;
     }
 
-    auto *hp = new HTTPRequest(buffer);
+    auto *hp = new HTTPRequest((char*)request->c_str());
 
     if (hp->getRequestLineCount() == 0) {
         return nullptr;
