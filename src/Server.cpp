@@ -3,6 +3,7 @@
 #include <string.h>
 #include <signal.h>
 #include "pthread.h"
+#include <mutex>
 #include "inc/HTTPRequest.h"
 #include "inc/Listener.h"
 #include "inc/Worker.h"
@@ -13,7 +14,7 @@
 
 #define PORT 8889
 #define MAX_CONNECTIONS 5000000
-#define USE_THREADS 0
+#define USE_THREADS 1
 #define REDIRECT_STDERR 1
 
 void removeStdoutBuffering();
@@ -37,20 +38,15 @@ void *dispatchThread(void *args);
 struct sockaddr_in *serverAddress;
 int listenFd = 0;
 int connections = 0;
+std::mutex mtx;
 
 int main(int argc, char *args[], char *arge[]) {
 
-    // Check Thread-Safety for multiple functions
-    // Remove buffers (use strings)
-    // Multi-threading tests
     // HTTPRequest should use HeaderBuild to store headers
     // Add comment why library is used
     // Add missing env-vars on CGI-BIN specified on RFC
     // Add timeout for empty-read to avoid locking
-    // BUG: Acessing index.html then trying to access CGI-BIN glitches CGI-BIN Environment Variables, possible fix: environ pointer
     // Keep-Alive connection support
-    // Content-Length support
-    // Content-Type support
     // Use vector in HeaderBuilder
 
     registerSignalHandler();
@@ -79,7 +75,6 @@ int main(int argc, char *args[], char *arge[]) {
 #else
         dispatchThread((void *) &connectionDescriptor);
 #endif
-        close(connectionDescriptor);
     }
 
     close(listenFd);
@@ -90,9 +85,13 @@ void *dispatchThread(void *args) {
 
     printf("Dispatched on descriptor: %d.\n", connectionDescriptor);
 
+    mtx.lock();
+
     auto *listener = new Listener(connectionDescriptor);
 
     auto *request = listener->readRequest();
+
+    mtx.unlock();
 
     if (request == nullptr) {
         printf("Received nullptr request, skipping worker dispatch...\n");
@@ -105,6 +104,8 @@ void *dispatchThread(void *args) {
     }
 
     listener->close();
+
+    close(connectionDescriptor);
 
     delete listener;
 
@@ -154,7 +155,7 @@ int accept() {
 }
 
 void handleSignal(int signum) {
-    printf("->Receiving signal %d\n");
+    printf("->Receiving signal %d\n", signum);
 }
 
 void registerSignalHandler() {
