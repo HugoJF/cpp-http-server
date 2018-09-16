@@ -3,11 +3,13 @@
 //
 
 #include "HTTPRequest.h"
+#include <src/HeaderBuilder.h>
 #include <iostream>
 #include <string.h>
 
 HTTPRequest::HTTPRequest(char *rawRequest) {
     this->rawRequest = copyString(rawRequest);
+    this->headers = new HeaderBuilder();
     requestLine = new char *[3];
 
     parse();
@@ -47,7 +49,6 @@ int HTTPRequest::countRequestLines() {
     }
     if (count > 0) {
         requestLineCount = count;
-        headerCount = count - 1;
         requestParts = new char *[count];
         // clonar strings
         return count;
@@ -92,8 +93,6 @@ void HTTPRequest::parseRequestLine() {
 }
 
 void HTTPRequest::parseRequestHeader() {
-    headers = new char **[requestLineCount - 1];
-
     for (int i = 0; i < requestLineCount - 1; ++i) {
         parserHeader(i);
     }
@@ -104,38 +103,27 @@ char *HTTPRequest::getRequestLine(int i) {
 }
 
 void HTTPRequest::parserHeader(int i) {
-    headers[i] = new char *[2];
     char *header = new char[strlen(getRawHeader(i))];
 
     strcpy(header, getRawHeader(i));
 
-    headers[i][0] = strtok(header, ":");
-    headers[i][1] = strtok(nullptr, ":");
+    char *key = strtok(header, ":");
+    char *value = strtok(nullptr, ":");
+
+    this->getHeaderBuilder()->addHeader(key, value);
+}
+
+HeaderBuilder *HTTPRequest::getHeaderBuilder() const {
+    return headers;
 }
 
 char *HTTPRequest::getRawHeader(int i) {
     return getLine(i + 1);
 }
 
-char **HTTPRequest::getHeader(int i) {
-    return headers[i];
-}
 
 char *HTTPRequest::getHeaderValue(int i) {
-    return headers[i][1];
-}
-
-char **HTTPRequest::getHeaderValue(const char *string) {
-    char **head;
-
-    for (int i = 0; i < headerCount; ++i) {
-        head = getHeader(i);
-        if (strcmp(string, head[0]) == 0) {
-            return head;
-        }
-    }
-
-    return nullptr;
+    return this->getHeaderBuilder()->getHeader(i)->value;
 }
 
 char *HTTPRequest::getQueryString() {

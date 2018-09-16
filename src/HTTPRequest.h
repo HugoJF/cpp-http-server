@@ -5,6 +5,8 @@
 #ifndef SIMPLE_HTTP_SERVER_HTTPREQUEST_H
 #define SIMPLE_HTTP_SERVER_HTTPREQUEST_H
 
+#include <src/HeaderBuilder.h>
+
 #define REQUEST_METHOD 0
 #define REQUEST_URI 1
 #define REQUEST_PROTOCOL 2
@@ -20,15 +22,11 @@ private:
     /// 3 segments of the main request line
     char **requestLine;
 
-    /// TODO: replace with header builder
     /// Array of request headers
-    char ***headers;
+    HeaderBuilder *headers;
 
     /// How many lines the request has
     int requestLineCount;
-
-    /// How many headers the request has
-    int headerCount;
 
     /// Parses the raw request
     void parse();
@@ -83,16 +81,10 @@ public:
     /// \return - raw request line
     char *getLine(int line);
 
-    /// \param i - header index
-    /// \return - processed header with index i
-    char **getHeader(int i);
-
-    /// \param string - header key
-    /// \return - header value
-    char **getHeaderValue(const char *string);
-
     /// \return - request line count
     int getRequestLineCount() const;
+
+    HeaderBuilder *getHeaderBuilder() const;
 };
 
 

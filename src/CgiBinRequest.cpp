@@ -79,8 +79,8 @@ void CgiBinRequest::solve() {
 
     pid_t pid = fork();
 
-    if (pid == 0) { // child
-        run();
+    if (pid == 0) {
+        run(); // child
     } else {
         listen(); // parent, wait for child
     }
@@ -112,11 +112,14 @@ char *CgiBinRequest::getResponse() {
 char **CgiBinRequest::getEnvironment() {
     int vars = getTotalEnvironmentCount();
     char **env = new char *[vars + 1]; // nullptr terminator
+    char *temp = nullptr;
 
     vars = 0;
 
     while (environ[vars] != nullptr) {
-        env[vars] = environ[vars];
+        temp = new char[strlen(environ[vars]) + 1];
+        strcpy(temp, environ[vars]);
+        env[vars] = temp;
         vars++;
     }
     for (int i = 0; i < this->extendedEnvironment->size(); ++i) {

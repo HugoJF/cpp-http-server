@@ -15,7 +15,6 @@ Listener::Listener(int connectionFd) {
     this->connectionFd = connectionFd;
 }
 
-
 HTTPRequest *Listener::readRequest() {
 
     // TODO: use strings to avoid manually handling buffer
@@ -25,6 +24,7 @@ HTTPRequest *Listener::readRequest() {
     memset(buffer, '\0', bufferSize);
     auto requestBytesTotal = (_ssize_t) 0;
     auto requestBytes = (_ssize_t) bufferSize;
+
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {
         printf("Reading request... ");
@@ -41,6 +41,10 @@ HTTPRequest *Listener::readRequest() {
     }
 
     printf("Request total size: %d bytes.\n", (int) requestBytesTotal);
+
+    if(requestBytesTotal <= 0) {
+        return nullptr;
+    }
 
     auto *hp = new HTTPRequest(buffer);
 

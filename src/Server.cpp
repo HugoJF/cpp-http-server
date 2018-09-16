@@ -1,5 +1,6 @@
 #include <string.h> // memset
 #include <unistd.h>
+#include <string.h>
 #include <src/HTTPRequest.h>
 #include <src/Listener.h>
 #include <src/Worker.h>
@@ -45,6 +46,9 @@ int main(int argc, char *args[], char *arge[]) {
     // Add missing env-vars on CGI-BIN specified on RFC
     // Add timeout for empty-read to avoid locking
     // BUG: Acessing index.html then trying to access CGI-BIN glitches CGI-BIN Environment Variables, possible fix: environ pointer
+    // Keep-Alive connection support
+    // Content-Length support
+    // Content-Type support
 
     registerSignalHandler();
     removeStdoutBuffering();
@@ -56,7 +60,6 @@ int main(int argc, char *args[], char *arge[]) {
     bind();
 
     listen();
-
 
     while (connections++ < MAX_CONNECTIONS) {
         int connectionDescriptor = accept();
