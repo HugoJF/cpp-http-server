@@ -11,6 +11,7 @@
 class Listener {
 private:
     int connectionFd = 0;
+
 public:
     /// \param connectionFd - descriptor of connection to listen
     Listener(int connectionFd);
@@ -20,6 +21,9 @@ public:
 
     /// \return - HTTPRequest object representing current request received
     HTTPRequest *readRequest();
+
+    /// \param response - the full HTTP response to be sent back to user
+    void sendResponse(const char *response);
 
     /// Closes connection
     void close();
