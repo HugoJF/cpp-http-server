@@ -42,12 +42,17 @@ std::mutex mtx;
 
 int main(int argc, char *args[], char *arge[]) {
 
-    // HTTPRequest should use HeaderBuild to store headers
+    /**
+     * OPTIONAL
+     */
+
     // Add comment why library is used
     // Add missing env-vars on CGI-BIN specified on RFC
-    // Add timeout for empty-read to avoid locking
-    // Keep-Alive connection support
-    // Use vector in HeaderBuilder
+
+    /**
+     * NEEDED
+     */
+
 
     registerSignalHandler();
     removeStdoutBuffering();
@@ -103,11 +108,14 @@ void *dispatchThread(void *args) {
         delete worker;
     }
 
-    listener->close();
+    // TODO: Check RFC if default is close
+//    if(strcmp((char *) request->getHeaderBuilder()->getHeader("Connection"), "keep-alive") != 0) {
+        listener->close();
 
-    close(connectionDescriptor);
+        close(connectionDescriptor);
 
-    delete listener;
+        delete listener;
+//    }
 
     printf("REQUEST THREAD ENDED\n");
 }
