@@ -61,7 +61,7 @@ int HeaderBuilder::computeHeaderSize() {
         size += 4; // CRLF and ": "
     }
 
-    printf("Compute size to be %d byte\n", size);
+    printf("Header payload size: %d bytes\n", size);
 
     return size;
 }

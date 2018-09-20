@@ -13,6 +13,9 @@ class FileRequest {
     /// File contents
     char *fileContent;
 
+    /// File contents size (bytes)
+    int fileContentSize;
+
     /// File stat structure
     struct stat *sb;
 
@@ -32,6 +35,8 @@ public:
 
     /// \return - Cached file contents
     char *getResponse();
+
+    int getFileContentSize() const;
 
 };
 

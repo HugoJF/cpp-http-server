@@ -77,9 +77,14 @@ int FileRequest::solve() {
 
     close(filefd);
 
+    this->fileContentSize = readBytesTotal;
     this->fileContent = buffer;
 
     return 0;
+}
+
+int FileRequest::getFileContentSize() const {
+    return fileContentSize;
 }
 
 char *FileRequest::getResponse() {

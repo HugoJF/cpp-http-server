@@ -103,9 +103,9 @@ char *HTTPRequest::getRequestLine(int i) {
 }
 
 void HTTPRequest::parserHeader(int i) {
-    char *header = new char[strlen(getRawHeader(i)) + 1];
+    char *header = new char[strlen(getLine(i + 1)) + 1];
 
-    strcpy(header, getRawHeader(i));
+    strcpy(header, getLine(i + 1));
 
     char *key = strtok(header, ":");
     char *value = strtok(nullptr, ":");
@@ -117,14 +117,6 @@ HeaderBuilder *HTTPRequest::getHeaderBuilder() const {
     return headers;
 }
 
-char *HTTPRequest::getRawHeader(int i) {
-    return getLine(i + 1);
-}
-
-
-char *HTTPRequest::getHeaderValue(int i) {
-    return this->getHeaderBuilder()->getHeader(i)->value;
-}
 
 char *HTTPRequest::getQueryString() {
     char *uri = this->getRequestLine(REQUEST_URI);
