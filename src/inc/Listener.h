@@ -23,7 +23,7 @@ public:
     HTTPRequest *readRequest();
 
     /// \param response - the full HTTP response to be sent back to user
-    void sendResponse(const char *response);
+    void sendResponse(const char *response, int responseSize);
 
     /// Closes connection
     void close();

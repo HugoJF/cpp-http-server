@@ -10,13 +10,16 @@
 #include <unistd.h>
 #include "inc/HTTPRequest.h"
 #include "inc/Listener.h"
+#include <mutex>
+
+static std::mutex mtx;
 
 Listener::Listener(int connectionFd) {
     this->connectionFd = connectionFd;
 }
 
 HTTPRequest *Listener::readRequest() {
-    auto bufferSize = (size_t) 1024;
+    auto bufferSize = (unsigned long) 1024;
     char buffer[bufferSize + 1];
     memset(buffer, '\0', bufferSize);
     auto requestBytesTotal =  0;
@@ -25,12 +28,19 @@ HTTPRequest *Listener::readRequest() {
 
     while (requestBytes == bufferSize && requestBytesTotal < bufferSize) {
         printf("Reading request... ");
-        requestBytes = read(connectionFd, buffer, bufferSize);
+
+        mtx.lock();
+
+        requestBytes = (unsigned long) read(connectionFd, buffer, bufferSize);
+
+        mtx.unlock();
 
         if (requestBytes < 0) {
             printf("ERROR: %s\n", strerror(errno));
 
             return nullptr;
+        } else if (requestBytes > bufferSize) {
+
         } else {
             printf("Read %d bytes\n", (int) requestBytes);
             requestBytesTotal += requestBytes;
@@ -56,12 +66,12 @@ HTTPRequest *Listener::readRequest() {
 
 }
 
-void Listener::sendResponse(const char *response) {
-    int bytesToSend = sizeof(char) * strlen(response);
+void Listener::sendResponse(const char *response, int responseSize) {
+    int bytesToSend = responseSize;
     ssize_t bytesSent = 0;
 
     while (bytesToSend > 0) {
-        bytesSent = send(getConnectionFd(), response + (strlen(response) - bytesToSend), sizeof(char) * bytesToSend, 0);
+        bytesSent = send(getConnectionFd(), response + (responseSize - bytesToSend), sizeof(char) * bytesToSend, 0);
         bytesToSend -= bytesSent;
     }
 }
