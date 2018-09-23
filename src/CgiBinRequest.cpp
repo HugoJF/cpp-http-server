@@ -14,7 +14,7 @@
 #include "inc/HTTPRequest.h"
 
 #define BUFFER_SIZE 1024
-#define CGI_BIN_FOLDER "/home/hugo/cpp-http-server"
+#define CGI_BIN_FOLDER ".."
 // TODO: Avoid using fixed buffer, if response is bigger than BUFFER_SIZE overflow will occur
 
 CgiBinRequest::CgiBinRequest(char *filePath, HTTPRequest *httpRequest) {
