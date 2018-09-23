@@ -66,7 +66,6 @@ void Worker::work() {
         response = serveStaticFile(fixedUri);
     }
 
-
     if (response == nullptr || strlen(response) == 0) {
         printf("Could not send correct response to client: empty response. Serving 404 error\n");
         response = serve404(uri);
@@ -82,7 +81,11 @@ char *Worker::serveStaticFile(char *fixedUri) {
     auto *rb = new HeaderBuilder();
     string *res = new string();
 
-    fr->solve();
+    int result = fr->solve();
+
+    if(result == 1) {
+        return nullptr;
+    }
 
     addContentTypeHeader(fixedUri, rb);
     rb->addHeader("Content-Length", (char *) std::to_string(fr->getFileContentSize()).c_str());
@@ -108,7 +111,7 @@ void Worker::addContentTypeHeader(const char *fixedUri, HeaderBuilder *rb) const
     } else if (strstr(fixedUri, "svg")) {
         rb->addHeader("Content-Type", "image/svg+xml");
     } else {
-        rb->addHeader("Content-Type", "image/plain");
+        rb->addHeader("Content-Type", "text/plain");
     }
 }
 
@@ -128,7 +131,8 @@ char *Worker::serveCgiBin(char *fixedUri) {
 char *Worker::serve404(char *fixedUri) {
     string *res = new string();
 
-    res->append("HTTP/1.1 404 Not Found\r\n\r\n");
+    res->append("HTTP/1.1 404 Not Found\r\n");
+    res->append("Content-Type: text/plain\r\n\r\n");
     res->append("The requested URL ");
     res->append(fixedUri);
     res->append(" could not be found on this server.");
