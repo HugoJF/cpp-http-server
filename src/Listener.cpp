@@ -40,7 +40,7 @@ HTTPRequest *Listener::readRequest() {
 
             return nullptr;
         } else if (requestBytes > bufferSize) {
-
+            // TODO: overflow error
         } else {
             printf("Read %d bytes\n", (int) requestBytes);
             requestBytesTotal += requestBytes;
