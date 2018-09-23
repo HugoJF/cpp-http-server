@@ -51,6 +51,7 @@ int main(int argc, char *args[], char *arge[]) {
 
     // Add comment why library is used
     // Add missing env-vars on CGI-BIN specified on RFC
+    // Persistent connections support
 
     /**
      * NEEDED
@@ -119,14 +120,15 @@ void *dispatchThread(void *args) {
         delete worker;
     }
 
-    // TODO: Check RFC if default is close
-//    if(strcmp((char *) request->getHeaderBuilder()->getHeader("Connection"), "keep-alive") != 0) {
-    listener->close();
+    bool keepAlive = strcmp((char *) request->getHeaderBuilder()->getHeader("Connection"), "keep-alive") == 0;
 
-    close(connectionDescriptor);
+    if (request == nullptr || !keepAlive) {
+        listener->close();
 
-    delete listener;
-//    }
+        close(connectionDescriptor);
+
+        delete listener;
+    }
 
     printf("REQUEST THREAD ENDED\n");
     mtx.lock();
