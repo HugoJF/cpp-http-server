@@ -56,8 +56,7 @@ int FileRequest::solve() {
     }
 
     int bufferSize = sizeof(char) * (sb->st_size + 1); // +1 for \0
-    char *buffer = new char[bufferSize + 1];
-    memset(buffer, '\0', sizeof(char) * bufferSize);
+    char *buffer = new char[bufferSize];
 
     auto readBytesTotal = 0;
     auto readBytes =  bufferSize;
@@ -70,7 +69,7 @@ int FileRequest::solve() {
             printf("Error reading file: %s\n", strerror(errno));
             return errno;
         } else {
-            printf("Read %d bytes\n", (int) readBytes);
+            printf("Read %d bytes\n", readBytes);
             readBytesTotal += readBytes;
         }
     }

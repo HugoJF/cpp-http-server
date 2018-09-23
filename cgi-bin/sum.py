@@ -17,4 +17,5 @@ except:
     print '<p>Sorry, we cannot turn your inputs into numbers (integers).</p>'
     exit()
 print '<p>{0} + {1} = {2}</p>'.format(num1, num2, num1 + num2)
+print '<a href="/">Back</a>'
 # https://pastebin.com/Vc2EM6cn

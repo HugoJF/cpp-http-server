@@ -34,6 +34,8 @@ public:
     char *serveStaticFile(char *fixedUri);
 
     char *serve404(char *fixedUri);
+
+    void addContentTypeHeader(const char *fixedUri, HeaderBuilder *rb) const;
 };
 
 #endif //SIMPLE_HTTP_SERVER_WORKER_H

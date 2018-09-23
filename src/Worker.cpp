@@ -84,7 +84,22 @@ char *Worker::serveStaticFile(char *fixedUri) {
 
     fr->solve();
 
-    if(strstr(fixedUri, "jpeg") != nullptr || strstr(fixedUri, "jpg") != nullptr) {
+    addContentTypeHeader(fixedUri, rb);
+    rb->addHeader("Content-Length", (char *) std::to_string(fr->getFileContentSize()).c_str());
+
+    res->append("HTTP/1.1 200 OK\r\n");
+    res->append(rb->render());
+    res->append("\r\n");
+    responseSize = strlen(res->c_str());
+    res->append(fr->getResponse(), (unsigned long) fr->getFileContentSize());
+
+    responseSize += fr->getFileContentSize();
+
+    return (char *) res->c_str();
+}
+
+void Worker::addContentTypeHeader(const char *fixedUri, HeaderBuilder *rb) const {
+    if (strstr(fixedUri, "jpeg") != nullptr || strstr(fixedUri, "jpg") != nullptr) {
         rb->addHeader("Content-Type", "image/jpeg");
     } else if (strstr(fixedUri, "png")) {
         rb->addHeader("Content-Type", "image/png");
@@ -95,17 +110,6 @@ char *Worker::serveStaticFile(char *fixedUri) {
     } else {
         rb->addHeader("Content-Type", "image/plain");
     }
-    rb->addHeader("Content-Length", (char*) std::to_string(fr->getFileContentSize()).c_str());
-
-    res->append("HTTP/1.1 200 OK\r\n");
-    res->append(rb->render());
-    res->append("\r\n");
-    responseSize = (int) res->size();
-    res->append(fr->getResponse(), (unsigned long) fr->getFileContentSize());
-
-    responseSize += fr->getFileContentSize();
-
-    return (char *) res->c_str();
 }
 
 char *Worker::serveCgiBin(char *fixedUri) {
