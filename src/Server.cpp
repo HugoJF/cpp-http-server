@@ -119,9 +119,7 @@ void *dispatchThread(void *args) {
         delete worker;
     }
 
-    bool keepAlive = strcmp((char *) request->getHeaderBuilder()->getHeader("Connection"), "keep-alive") == 0;
-
-    if (request == nullptr || !keepAlive) {
+    if (request == nullptr || strcmp((char *) request->getHeaderBuilder()->getHeader("Connection"), "keep-alive") != 0) {
         listener->close();
 
         close(connectionDescriptor);
