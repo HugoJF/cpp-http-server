@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 project(simple-http-server)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
