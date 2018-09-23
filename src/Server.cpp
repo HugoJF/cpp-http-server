@@ -58,7 +58,6 @@ int main(int argc, char *args[], char *arge[]) {
      */
 
     handleParameters(argc, args);
-    registerSignalHandler();
     removeStdoutBuffering();
 
     boot();
@@ -137,15 +136,16 @@ void *dispatchThread(void *args) {
 }
 
 void handleParameters(int argc, char *args[]) {
-    if (strcmp(args[1], "-f") && argc == 3) {
+    if (argc == 3 && strcmp(args[1], "-f")) {
         printf("Forking is not supported\n");
-    } else if (strcmp(args[1], "-t") || argc == 4) {
+    } else if (argc == 4 && strcmp(args[1], "-t")) {
         multiThreaded = true;
         maxThreads = atoi(args[2]);
         port = atoi(args[3]);
         printf("Multi-threaded initialization with %d max threads on port %d\n", maxThreads, port);
     } else {
         printf("Missing or incorrect parameters. Usage: %s -f PORT or %s -t MAX_THREADS PORT\n", args[0], args[0]);
+        exit(1);
     }
 }
 
@@ -193,10 +193,6 @@ int accept() {
 
 void handleSignal(int signum) {
     printf("->Receiving signal %d\n", signum);
-}
-
-void registerSignalHandler() {
-    signal(SIGINT, handleSignal);
 }
 
 
