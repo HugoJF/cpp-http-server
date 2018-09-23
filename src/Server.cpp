@@ -136,9 +136,9 @@ void *dispatchThread(void *args) {
 }
 
 void handleParameters(int argc, char *args[]) {
-    if (argc == 3 && strcmp(args[1], "-f")) {
+    if (argc == 3 && strcmp(args[1], "-f") == 0) {
         printf("Forking is not supported\n");
-    } else if (argc == 4 && strcmp(args[1], "-t")) {
+    } else if (argc == 4 && strcmp(args[1], "-t") == 0) {
         multiThreaded = true;
         maxThreads = atoi(args[2]);
         port = atoi(args[3]);
