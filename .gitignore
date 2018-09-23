@@ -1,4 +1,4 @@
 .idea/
-cgi-bin/*
 cmake-build-debug/
+cmake-build-release/
 htdocs/*
